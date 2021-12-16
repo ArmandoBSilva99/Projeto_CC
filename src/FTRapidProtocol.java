@@ -54,35 +54,34 @@ public class FTRapidProtocol {
     */
 
     //To establish connection
-    public void connCheck(DatagramSocket s, String hostS, int port, SimplePacket p, SimplePacket ack) throws IOException{
+    public void connCheck(DatagramSocket s, String hostS, int port, DataPacket p, DataPacket ack) throws IOException{
         System.out.println("Servidor 1 diz: " + ack.getAck());
         if (ack.getAck() == 0) {
-            p.setAck(1);
+            //p.setAck(1);
             System.out.println("Not Acknowledged\nSending again...");
             send(s, hostS, port, p);
 
             System.out.println("Connection Established");
-
         }
-        ack.printSimplePacket();
     }
 
     //Send Packets
-    public void send(DatagramSocket s, String hostS, int port, SimplePacket p) throws IOException{
+    public void send(DatagramSocket s, String hostS, int port, DataPacket p) throws IOException{
         InetAddress host = InetAddress.getByName(hostS);
-        byte[] m = p.packetToBytes();
         System.out.println("Servidor a enviar para " + host);
         //System.out.println("Tamanho m: " + m.length);
-        s.send(new DatagramPacket(m, m.length, host, port)); 
+        for(byte[] m : p.getPackets()) {
+            s.send(new DatagramPacket(m, m.length, host, port));
+        }
     }
 
     //Receive Packets
-    public SimplePacket receive(DatagramSocket s) throws IOException{
+    public DataPacket receive(DatagramSocket s) throws IOException{
         byte[] packetBytes = new byte[1024];
         DatagramPacket dp = new DatagramPacket(packetBytes, packetBytes.length);
         s.receive(dp);
-        SimplePacket pacote = new SimplePacket(1);
-        pacote.bytesToPacket(packetBytes);
+        DataPacket pacote = new DataPacket();
+        //pacote.bytesToPacket(packetBytes);
         return pacote;
     }
 

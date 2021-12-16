@@ -1,6 +1,7 @@
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.time.format.DateTimeParseException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -13,26 +14,36 @@ import java.time.ZoneId;
 import java.util.*;
 
 public class FFSync {
-    public static void main(String args[]) throws Exception{
+    public static void main(String args[]) {
         DatagramSocket s;
         FTRapidProtocol p = new FTRapidProtocol();
         int port = 8888;
-        String ip = args[0];
+        String folder = args[0];
+        String ip = args[1];
 
         try {
             s = new DatagramSocket(port);
-            String message = myFiles();
-            byte[] m = message.getBytes();
-            SimplePacket pack1 = new SimplePacket(0,0,m); 
+            DataPacket pack1 = new DataPacket();
+            pack1.fileListPackets(folder);
+            //String message = myFiles();
+            //byte[] m = message.getBytes();
+            //SimplePacket pack1 = new SimplePacket(0,0,m);
             p.send(s, ip, port, pack1);
             System.out.println("sent");
             s.setSoTimeout(10000);
 
-            SimplePacket pack2 = p.receive(s);
-            byte[] recv = pack2.getData();
-            String sRecv = new String(recv, StandardCharsets.UTF_8);
-            System.out.println("Mensagem recebida:\n" + sRecv);
-            p.connCheck(s,ip,port,pack1,pack2);
+            try {
+                DataPacket pack2 = p.receive(s);
+                //SimplePacket pack2 = p.receive(s);
+                List<byte[]> recv = pack2.getPackets();
+                String sRecv = new String(recv.get(0), StandardCharsets.UTF_8);
+                System.out.println("Mensagem recebida:\n" + sRecv);
+                //Send ack..
+            } catch (IOException e) {
+                System.out.println("Packet not received.");
+            }
+
+            p.connCheck(s,ip,port,pack1,);
 
             SimplePacket pack3 = missingFiles(message,sRecv);  
             p.send(s, ip, port, pack3);
@@ -42,7 +53,7 @@ public class FFSync {
 
             //Send missing files...
             //Receive missing files...
-            
+
         } catch (Exception e){
             System.err.println(e);
         }    

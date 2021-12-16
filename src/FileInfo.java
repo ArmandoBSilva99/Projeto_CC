@@ -9,7 +9,6 @@ public class FileInfo {
 		this.data = data;
 	}
 
-
 	public String getName() {
 		return this.name;
 	}

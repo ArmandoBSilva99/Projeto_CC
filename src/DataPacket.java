@@ -14,6 +14,10 @@ public class DataPacket {
         packets = new ArrayList<>();
     }
 
+    public List<byte[]> getPackets() {
+        return packets;
+    }
+
     public void filePackets(String filepath) throws IOException {
         File f = new File(filepath);
         byte[] file = Files.readAllBytes(Paths.get(f.getPath())); // talvez mudar para absolute path!
@@ -33,7 +37,7 @@ public class DataPacket {
         }
     }
 
-    public void fileListPackets(char id, String filepath) throws IOException {
+    public void fileListPackets(String filepath) throws IOException {
         File f = new File(filepath);
         File[] f_list = f.listFiles();
         BasicFileAttributes attr;
@@ -42,7 +46,7 @@ public class DataPacket {
         for (File file : f_list) {
             if (file.isFile()) {
                 attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                sb.append(file.getName() + ";" + file.getName() + ";" + attr.creationTime().toString() + ";" + attr.lastModifiedTime().toInstant().toString() + ";");
+                sb.append(file.getName() + ";" + attr.creationTime().toString() + ";" + attr.lastModifiedTime().toInstant().toString() + ";");
             }
         }
 
