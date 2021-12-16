@@ -8,14 +8,13 @@ public class FTRapidProtocol {
 
     //To establish connection
     public void connCheck(DatagramSocket s, String hostS, int port, DataPacket p, DataPacket ack) throws IOException{
-        System.out.println("Servidor 1 diz: " + ack.getAck());
-        if (ack.getAck() == 0) {
-            //p.setAck(1);
-            System.out.println("Not Acknowledged\nSending again...");
-            send(s, hostS, port, p);
+        //System.out.println("Servidor 1 diz: " + ack.getAck());
+        
+        System.out.println("Not Acknowledged\nSending again...");
+        send(s, hostS, port, p);
 
-            System.out.println("Connection Established");
-        }
+        System.out.println("Connection Established");
+        
     }
 
     //Send Packets

@@ -24,27 +24,35 @@ public class FFSync {
         try {
             s = new DatagramSocket(port);
             DataPacket pack1 = new DataPacket();
-            pack1.fileListPackets(folder);
-            //String message = myFiles();
-            //byte[] m = message.getBytes();
-            //SimplePacket pack1 = new SimplePacket(0,0,m);
+            pack1.fileListPackets(folder); //List of files in folder
+            
             p.send(s, ip, port, pack1);
             System.out.println("sent");
-            s.setSoTimeout(10000);
 
-            try {
-                DataPacket pack2 = p.receive(s);
-                //SimplePacket pack2 = p.receive(s);
-                List<byte[]> recv = pack2.getPackets();
+            s.setSoTimeout(10000);
+            
+            
+            DataPacket pack2 = p.receive(s);
+            List<byte[]> recv = pack2.getPackets();
+            if (recv.size() != 0) {
+                System.out.println("A transformar em String");
                 String sRecv = new String(recv.get(0), StandardCharsets.UTF_8);
+                System.out.println("String transformada");
                 System.out.println("Mensagem recebida:\n" + sRecv);
                 //Send ack..
-            } catch (IOException e) {
-                System.out.println("Packet not received.");
-            }
+                DataPacket ack = new DataPacket();
+                ack.ackPacket(1);
+                p.send(s, ip, port, ack);
+            }    
+            else {
+                System.out.println("Packet not received.");    
+            }    
+            
+            //DataPacket ack2 = p.receive(s);
 
-            p.connCheck(s,ip,port,pack1,);
 
+            //p.connCheck(s,ip,port,pack1, ack);
+            /*
             SimplePacket pack3 = missingFiles(message,sRecv);  
             p.send(s, ip, port, pack3);
 
@@ -53,7 +61,7 @@ public class FFSync {
 
             //Send missing files...
             //Receive missing files...
-
+            */
         } catch (Exception e){
             System.err.println(e);
         }    
