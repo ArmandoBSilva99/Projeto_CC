@@ -66,10 +66,4 @@ public class DataPacket {
         }
     }
 
-    public void ackPacket(int seqnum) throws IOException {
-        ByteArrayOutputStream aux = new ByteArrayOutputStream();
-        PacketHeader ph = new PacketHeader(seqnum);
-        aux.write(ph.toBytes());
-        this.packets.add(aux.toByteArray());
-    }
 }

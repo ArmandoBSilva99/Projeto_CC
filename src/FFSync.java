@@ -7,6 +7,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.SizeRequirements;
+
 import java.io.File;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,33 +24,34 @@ public class FFSync {
         String folder = args[0];
         String ip = args[1];
 
-        try {
-            s = new DatagramSocket(port);
-            DataPacket pack1 = new DataPacket();
-            pack1.fileListPackets(folder); //List of files in folder
+        
+            try {
+                s = new DatagramSocket(port);
+                
+                DataPacket pack1 = new DataPacket();
+                pack1.fileListPackets(folder); //List of files in folder
             
-            p.send(s, ip, port, pack1);
-            System.out.println("sent");
+                p.send(s, ip, port, pack1);
+                System.out.println("sent");
 
-            s.setSoTimeout(10000);
+                s.setSoTimeout(10000);
             
             
-            DataPacket pack2 = p.receive(s);
-            List<byte[]> recv = pack2.getPackets();
-            if (recv.size() != 0) {
-                System.out.println("A transformar em String");
-                String sRecv = new String(recv.get(0), StandardCharsets.UTF_8);
-                System.out.println("String transformada");
-                System.out.println("Mensagem recebida:\n" + sRecv);
-                //Send ack..
-                DataPacket ack = new DataPacket();
-                ack.ackPacket(1);
-                p.send(s, ip, port, ack);
-            }    
-            else {
-                System.out.println("Packet not received.");    
-            }    
-            
+                DataPacket pack2 = p.receive(s); //Receber coisas
+                List<byte[]> recv = pack2.getPackets();
+                
+                if (recv.size() != 0 && (recv.get(0))[0] != 'A') { //Se não for Ack
+                    String sRecv = new String(recv.get(0), StandardCharsets.UTF_8);
+                    System.out.println("Mensagem recebida: " + sRecv);
+                    //Send ack..
+                    PacketHeader ack = new PacketHeader(1);
+                    p.sendAck(s, ip, port, ack); //Enviar Ack
+                    
+                }    
+                else { //Se for Ack
+                    System.out.println("Packet not received.");    
+                }    
+
             //DataPacket ack2 = p.receive(s);
 
 
@@ -62,10 +66,11 @@ public class FFSync {
             //Send missing files...
             //Receive missing files...
             */
-        } catch (Exception e){
-            System.err.println(e);
-        }    
-    }
+            } catch (Exception e){
+                System.err.println(e);
+        }   
+    } 
+
 
     public static String myFiles() {
         StringBuilder sb = new StringBuilder();

@@ -27,7 +27,7 @@ public class PacketHeader {
     public byte[] toBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
-        dos.writeChar(id);
+        dos.write(id);
         if (id != 'A')
             dos.writeInt(npack);
         if (id == 'F')

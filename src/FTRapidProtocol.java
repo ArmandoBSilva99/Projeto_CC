@@ -27,13 +27,21 @@ public class FTRapidProtocol {
         }
     }
 
+    public void sendAck(DatagramSocket s, String hostS, int port, PacketHeader p) throws IOException{
+        InetAddress host = InetAddress.getByName(hostS);
+        System.out.println("Servidor a enviar para " + host);
+        //System.out.println("Tamanho m: " + m.length);
+        byte[] m = p.toBytes();
+        s.send(new DatagramPacket(m, m.length, host, port));        
+    }
+
     //Receive Packets
     public DataPacket receive(DatagramSocket s) throws IOException{
         byte[] packetBytes = new byte[1024];
         DatagramPacket dp = new DatagramPacket(packetBytes, packetBytes.length);
         s.receive(dp);
         DataPacket pacote = new DataPacket();
-        //pacote.bytesToPacket(packetBytes);
+        pacote.getPackets().add(packetBytes);
         return pacote;
     }
 
