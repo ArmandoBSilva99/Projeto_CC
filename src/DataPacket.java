@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataPacket {
-    private static final int packet_size = 1420;
-    private List<byte[]> packets;
+    public static final int packet_size = 1420;
+    private List<byte[]> packets;  //Mudar para List<PacketHeader>
 
     public DataPacket() {
         packets = new ArrayList<>();
@@ -18,6 +18,7 @@ public class DataPacket {
         return packets;
     }
 
+    //MUDAR CONTAS??
     public void filePackets(String filepath) throws IOException {
         File f = new File(filepath);
         byte[] file = Files.readAllBytes(Paths.get(f.getPath())); // talvez mudar para absolute path!
@@ -25,18 +26,21 @@ public class DataPacket {
 
         int file_size = (int) f.length();
         String nome = f.getName();
-        int len_header = (nome.length() + 2) + 9;                   // 2 -> cabeçalho da writeUTF da classe DataInputStream e 9 -> 1 do id, 4 do npack, 4 do seqnum
+        int len_header = (nome.length() + 2) + 13;                   // 2 -> cabeçalho da writeUTF da classe DataInputStream e 9 -> 1 do id, 4 do npack, 4 do seqnum
         int data_packet_size = packet_size - len_header;
         int npack = 1 + (file_size / data_packet_size);
+        int min_packet_size;
 
         for (int i = 0; i < npack; i++) {
-            PacketHeader ph = new PacketHeader(npack, nome, i);
+            min_packet_size = Math.min((file_size - i * data_packet_size), data_packet_size);
+            PacketHeader ph = new PacketHeader(min_packet_size,npack, nome, i);
             aux.write(ph.toBytes());
-            aux.write(file, i * data_packet_size, Math.min((file_size - i * data_packet_size), data_packet_size));
+            aux.write(file, i * data_packet_size, min_packet_size);
             this.packets.add(aux.toByteArray());
         }
     }
 
+    //MUDAR CONTAS??
     public void fileListPackets(String filepath) throws IOException {
         File f = new File(filepath);
         File[] f_list = f.listFiles();
@@ -54,16 +58,32 @@ public class DataPacket {
         byte[] list = sb.toString().getBytes(StandardCharsets.UTF_8);
 
         int list_size = list.length;
-        int len_header = 9;
+        int len_header = 13;
         int data_packet_size = packet_size - len_header;
         int npack = 1 + (list_size / data_packet_size);
+        int min_packet_size;
 
         for (int i = 0; i < npack; i++) {
-            PacketHeader fh = new PacketHeader(npack, i);
+            min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
+            PacketHeader fh = new PacketHeader(min_packet_size ,npack, i);
             aux.write(fh.toBytes());
-            aux.write(list, i * data_packet_size, Math.min((list_size - i * data_packet_size), data_packet_size));
+            aux.write(list, i * data_packet_size, min_packet_size);
             this.packets.add(aux.toByteArray());
         }
     }
 
+    //Mudar
+    public byte[] unifyBytes() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for (byte[] m : this.packets) {
+
+            PacketHeader ph = PacketHeader.fromBytes(m);
+
+            baos.write(ph.getData());
+        }
+        byte[] res = baos.toByteArray();
+        baos.flush();
+        baos.close();
+        return res;
+    }
 }

@@ -27,7 +27,8 @@ public class FFSync {
         
             try {
                 s = new DatagramSocket(port);
-                
+                int i = 0;
+
                 DataPacket pack1 = new DataPacket();
                 pack1.fileListPackets(folder); //List of files in folder
             
@@ -38,8 +39,12 @@ public class FFSync {
             
             
                 DataPacket pack2 = p.receive(s); //Receber coisas
-                List<byte[]> recv = pack2.getPackets();
+                byte[] res = pack2.unifyBytes();
+                String sRecv = new String(res, StandardCharsets.UTF_8);
+                System.out.println("Mensagem recebida: " + sRecv + "\n");
+                i++;
                 
+                /*
                 if (recv.size() != 0 && (recv.get(0))[0] != 'A') { //Se não for Ack
                     String sRecv = new String(recv.get(0), StandardCharsets.UTF_8);
                     System.out.println("Mensagem recebida: " + sRecv);
@@ -51,7 +56,7 @@ public class FFSync {
                 else { //Se for Ack
                     System.out.println("Packet not received.");    
                 }    
-
+            */
             //DataPacket ack2 = p.receive(s);
 
 
