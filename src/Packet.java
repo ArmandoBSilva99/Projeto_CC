@@ -1,6 +1,6 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.lang.Object;
+
 
 public class Packet {
     private char id;
@@ -29,6 +29,7 @@ public class Packet {
         this.data = data.clone();
     }
 
+    // packet for ack
     public Packet(int seqnum) {
         this.id = 'A';
         this.seqnum = seqnum;
@@ -40,6 +41,7 @@ public class Packet {
 
 
     public byte[] toBytes() throws IOException {
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
 
@@ -51,11 +53,13 @@ public class Packet {
         if (id == 'F')
             dos.writeUTF(nome);
         dos.writeInt(seqnum);
-        dos.write(data);
+        if (id != 'A')
+            dos.write(data);
 
         dos.flush();
         dos.close();
         baos.flush();
+        //System.out.println("To bytes completed");
         return baos.toByteArray();
     }
 
@@ -76,10 +80,10 @@ public class Packet {
             nome = isr.readUTF();
 
         int seqnum = isr.readInt();
-        isr.read(data, 0, size);
+        if (id != 'A')
+            isr.read(data, 0, size);
         isr.close();
         String sRecv = new String(b, StandardCharsets.UTF_8);
-        System.out.println("Mensagem recebida FROMBYTES B: " + sRecv);
 
 
         Packet res;

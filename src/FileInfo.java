@@ -1,16 +1,14 @@
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class FileInfo {
     public static final String file_separator = "\u001C";
-    public static final String para_separetor = "\u001F";
+    public static final String para_separator = "\u001F";
     private String name;
     private Instant creation_date;
     private Instant modified_date;
@@ -52,7 +50,7 @@ public class FileInfo {
         String[] strings = s.split(FileInfo.file_separator);
 
         for (String string : strings) {
-            String[] info = string.split(FileInfo.para_separetor);
+            String[] info = string.split(FileInfo.para_separator);
             Instant creation_date = Instant.parse(info[1]);
             Instant modified_date = Instant.parse(info[2]);
             FileInfo hi = new FileInfo(info[0], creation_date, modified_date);
@@ -91,8 +89,8 @@ public class FileInfo {
 
     @Override
     public String toString() {
-        return this.name + para_separetor +
-                this.creation_date.toString() + para_separetor +
+        return this.name + para_separator +
+                this.creation_date.toString() + para_separator +
                 this.modified_date.toString() + file_separator;
     }
 }

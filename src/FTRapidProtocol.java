@@ -6,9 +6,9 @@ import java.nio.charset.StandardCharsets;
 
 public class FTRapidProtocol {
 
+    /*
     //To establish connection
     public void connCheck(DatagramSocket s, String hostS, int port, DataPacket p, DataPacket ack) throws IOException{
-        //System.out.println("Servidor 1 diz: " + ack.getAck());
         
         System.out.println("Not Acknowledged\nSending again...");
         send(s, hostS, port, p);
@@ -16,35 +16,34 @@ public class FTRapidProtocol {
         System.out.println("Connection Established");
         
     }
-
+    */
+    
     //Send Packets
-    public void send(DatagramSocket s, String hostS, int port, DataPacket p) throws IOException{
+    public void send(DatagramSocket s, String hostS, int port, DataPacket p, int index) throws IOException{
         InetAddress host = InetAddress.getByName(hostS);
         System.out.println("Servidor a enviar para " + host);
-        //System.out.println("Tamanho m: " + m.length);
-        for(byte[] m : p.getPackets()) {
-            s.send(new DatagramPacket(m, m.length, host, port));
-        }
+        byte[] m = p.getPackets().get(index);
+        s.send(new DatagramPacket(m, m.length, host, port));
     }
 
     public void sendAck(DatagramSocket s, String hostS, int port, Packet p) throws IOException{
         InetAddress host = InetAddress.getByName(hostS);
         System.out.println("Servidor a enviar para " + host);
-        //System.out.println("Tamanho m: " + m.length);
         byte[] m = p.toBytes();
-        s.send(new DatagramPacket(m, m.length, host, port));        
+        System.out.println("In bytes ready to send");
+        s.send(new DatagramPacket(m, m.length, host, port));      
+        System.out.println("Sent");  
     }
 
     //Receive Packets
-    public DataPacket receive(DatagramSocket s) throws IOException{
+    public byte[] receive(DatagramSocket s) throws IOException{
         byte[] packetBytes = new byte[DataPacket.packet_size];
         DatagramPacket dp = new DatagramPacket(packetBytes, packetBytes.length);
         s.receive(dp);
-        DataPacket pacote = new DataPacket();
-        pacote.getPackets().add(packetBytes);
-        return pacote;
+        return packetBytes;
     }
 
+    /*
     //Read MT
     public void readMessageType(int msgType, SimplePacket p) {
         if(msgType == 0) { //comparar listas
@@ -55,5 +54,5 @@ public class FTRapidProtocol {
         else if (msgType == 2); //...
         else ; //etc.
     }
-
+    */
 }    
