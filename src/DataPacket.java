@@ -5,6 +5,8 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class DataPacket {
     public static final int packet_size = 1420;
@@ -22,39 +24,34 @@ public class DataPacket {
     public void filePackets(String filepath) throws IOException {
         File f = new File(filepath);
         byte[] file = Files.readAllBytes(Paths.get(f.getPath())); // talvez mudar para absolute path!
-        ByteArrayOutputStream aux = new ByteArrayOutputStream();
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
 
         int file_size = (int) f.length();
         String nome = f.getName();
-        int len_header = (nome.length() + 2) + 13;                   // 2 -> cabeçalho da writeUTF da classe DataInputStream e 9 -> 1 do id, 4 do npack, 4 do seqnum
+        int len_header = (nome.length() + 2) + 13;                   // 2 -> cabeçalho da writeUTF da classe DataInputStream e 13 -> 1 do id,4 do size, 4 do npack, 4 do seqnum
         int data_packet_size = packet_size - len_header;
         int npack = 1 + (file_size / data_packet_size);
         int min_packet_size;
 
         for (int i = 0; i < npack; i++) {
+            data.reset();
             min_packet_size = Math.min((file_size - i * data_packet_size), data_packet_size);
-            PacketHeader ph = new PacketHeader(min_packet_size,npack, nome, i);
-            aux.write(ph.toBytes());
-            aux.write(file, i * data_packet_size, min_packet_size);
-            this.packets.add(aux.toByteArray());
+            data.write(file, i * data_packet_size, min_packet_size);
+
+            Packet p = new Packet(min_packet_size, npack, nome, i, data.toByteArray());
+
+            this.packets.add(p.toBytes());
         }
     }
 
     //MUDAR CONTAS??
-    public void fileListPackets(String filepath) throws IOException {
-        File f = new File(filepath);
-        File[] f_list = f.listFiles();
-        BasicFileAttributes attr;
-
+    public void fileListPackets(String filepath) throws IOException, NullPointerException {
         StringBuilder sb = new StringBuilder();
-        for (File file : f_list) {
-            if (file.isFile()) {
-                attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                sb.append(file.getName() + ";" + attr.creationTime().toString() + ";" + attr.lastModifiedTime().toInstant().toString() + ";");
-            }
-        }
 
-        ByteArrayOutputStream aux = new ByteArrayOutputStream();
+        Map<String, FileInfo> files = FileInfo.getDirFileInfo(filepath);
+        files.values().forEach(fileInfo -> sb.append(fileInfo.toString())); // talvez funcione testar ??
+
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
         byte[] list = sb.toString().getBytes(StandardCharsets.UTF_8);
 
         int list_size = list.length;
@@ -64,11 +61,36 @@ public class DataPacket {
         int min_packet_size;
 
         for (int i = 0; i < npack; i++) {
+            data.reset();
             min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
-            PacketHeader fh = new PacketHeader(min_packet_size ,npack, i);
-            aux.write(fh.toBytes());
-            aux.write(list, i * data_packet_size, min_packet_size);
-            this.packets.add(aux.toByteArray());
+            data.write(list, i * data_packet_size, min_packet_size);
+            byte[] data_packet = data.toByteArray();
+
+            Packet fh = new Packet('L', min_packet_size, npack, i, data_packet);
+            this.packets.add(fh.toBytes());
+        }
+    }
+
+    public void missingFileListPackets(String local_filepath, String received_file_list) throws IOException {
+        byte[] missing_files = FileInfo.missingFiles(local_filepath, received_file_list).getBytes(StandardCharsets.UTF_8);
+
+        ByteArrayOutputStream data = new ByteArrayOutputStream();
+
+        int list_size = missing_files.length;
+        int len_header = 13;
+        int data_packet_size = packet_size - len_header;
+        int npack = 1 + (list_size / data_packet_size);
+        int min_packet_size;
+
+        for (int i = 0; i < npack; i++) {
+            data.reset();
+
+            min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
+            data.write(missing_files, i * data_packet_size, min_packet_size);
+            byte[] data_packet = data.toByteArray();
+
+            Packet fh = new Packet('L', min_packet_size, npack, i, data_packet);
+            this.packets.add(fh.toBytes());
         }
     }
 
@@ -76,10 +98,9 @@ public class DataPacket {
     public byte[] unifyBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (byte[] m : this.packets) {
+            Packet p = Packet.fromBytes(m);
 
-            PacketHeader ph = PacketHeader.fromBytes(m);
-
-            baos.write(ph.getData());
+            baos.write(p.getData());
         }
         byte[] res = baos.toByteArray();
         baos.flush();

@@ -27,7 +27,7 @@ public class FTRapidProtocol {
         }
     }
 
-    public void sendAck(DatagramSocket s, String hostS, int port, PacketHeader p) throws IOException{
+    public void sendAck(DatagramSocket s, String hostS, int port, Packet p) throws IOException{
         InetAddress host = InetAddress.getByName(hostS);
         System.out.println("Servidor a enviar para " + host);
         //System.out.println("Tamanho m: " + m.length);
