@@ -19,7 +19,6 @@ public class DataPacket {
         return packets;
     }
 
-    //MUDAR CONTAS??
     public void filePackets(String filepath) throws IOException {
         File f = new File(filepath);
         byte[] file = Files.readAllBytes(Paths.get(f.getPath())); // talvez mudar para absolute path!
