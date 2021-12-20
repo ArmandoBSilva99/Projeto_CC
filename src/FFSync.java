@@ -9,13 +9,13 @@ public class FFSync {
         String folder = args[0];
         String ip = args[1];
 
-        // |-----------------------------------------------------------------------------------------------------------------------|
-        // |   Isto funciona quando ambos os servidores têm o mesmo número de partições, caso não tenham, o programa borra-se todo |
-        // |-----------------------------------------------------------------------------------------------------------------------|
+        // |---------------------------|
+        // |   Isto funciona Sempre!!! |
+        // |---------------------------|
 
         try {
             s = new DatagramSocket(port);
-            Packet packConn = new Packet(1);
+            Packet packConn = new Packet(0);
             p.connCheck(s, ip, port, packConn); //Começa a conexão, i.e, verifica se estão comunicáveis 
             DataPacket my_files = new DataPacket();
             my_files.fileListPackets(folder); //List of files in folder
@@ -23,54 +23,57 @@ public class FFSync {
             DataPacket allFragments = new DataPacket();
 
             int size = 10000; //Tamanho arbitrário que depois é alterado no for (numero de partições)
-            int ackmax = 10000; //Tamanho arbitrário que depois é alterado no for (numero de acks a dar)
+            int their_file_max = 10000; //Tamanho arbitrário que depois é alterado no for (numero de acks a dar)
+            int file_max = my_files.getPackets().size();
 
-            int filecounter = 0; // Inteiro para controlar os sends e receives
-            int ackcounter = 0; // Inteiro para controlar os sends e receives
+            
 
-            for(int i = 0; i < size; i++){
+            for(int i = 0, j = 0; (i < file_max || j < their_file_max);){
+    
                 s.setSoTimeout(500);
-                if (i < my_files.getPackets().size()) p.send(s, ip, port, my_files, i); //Envia enquanto houver partições para enviar
+                
+                if (i < file_max) p.send(s, ip, port, my_files, i); //Envia enquanto houver partições para enviar
 
                 boolean ackreceived = false; //Booleano que verifica se recebeu o ack
-                boolean filereceived = false; //Booleano que verifica se recebeu o ficheiro
-                
+                boolean filereceived = false; //Booleano que verifica se recebeu o ficheiro 
+
                 while ((!ackreceived) || (!filereceived)) {
                    
                     try {
                         byte[] frag = p.receive(s);
                         if (frag[0] != 'A') { //Se não for Ack, então é o file dele
-                            System.out.println("Got it"); //Debugging
-                            
-                            filecounter++;
-                            
-                            if (i == 0) { //Escolhe o tamanho de partições maior caso as pastas a sincronizar tenham um numero de ficheiros diferentes
-                                Packet packk = Packet.fromBytes(frag);
-                                size = Math.max(packk.getNPack(), my_files.getPackets().size());
-                                ackmax = packk.getNPack();   
-                            } 
 
-                            Packet myAck = new Packet(i);
+                            j++;
+
+                            Packet packk1 = Packet.fromBytes(frag);
+                            //System.out.println("Got it file " + packk1.getSeqNum()); //Debugging
+
+                            their_file_max = packk1.getNPack();   
+                            
+                            Packet myAck = new Packet(packk1.getSeqNum());
                             p.sendAck(s, ip, port, myAck); 
                             allFragments.getPackets().add(frag);
 
-                            String sRecv1 = new String(frag, StandardCharsets.UTF_8); //Debugging
-                            System.out.println("Fiiile: " + sRecv1); //Debugging
-
                             filereceived = true;
-                    
-
-                        }
-                        if (frag[0] == 'A'){ //Recebi um Ack
-                            System.out.println("Got it Ack"); //Debugging  
-                            ackreceived = true;
                             
-                            ackcounter++;
+                            if (i >= file_max)
+                                ackreceived = true;
+
+                        }
+                        if (frag[0] == 'A'){ //Recebi um Ack  
+
+                            Packet packk2 = Packet.fromBytes(frag);
+                            //System.out.println("Got it Ack " + packk2.getSeqNum()); //Debugging
+                            
+                            if (i == packk2.getSeqNum())
+                                ackreceived = true;
+
+                            if (j >= their_file_max)
+                                filereceived = true;    
+                            
+                            i++;
                         }
 
-                        //Suposto parar quando já enviou o máximo de acks ou de partições (DOESN'T FUCKING WORK, HELP)
-                        if (ackcounter == ackmax && filecounter == size)
-                            break;
                         
                     } catch (SocketTimeoutException e) {
                         System.out.println("Retrying");         
@@ -81,54 +84,34 @@ public class FFSync {
                         }    
                     }
                     
-                }  
-                System.out.println("Sai do while"); //Debugging
+                }    
             }
+            
             
             //Os ficheiros que o outro tem
             byte[] res = allFragments.unifyBytes();
             String sRecv = new String(res, StandardCharsets.UTF_8);
+            
+            /*
             String[] resultt = sRecv.split("\u001C");
             for(String str: resultt){
                 System.out.println("File: " + str);
             }
+            */
 
+            /*
             //Os ficheiros que me faltam
             String missing_files = FileInfo.missingFiles(folder, sRecv);
             String[] result = missing_files.split("\u001C");
             for(String str: result){
-                System.out.println("Missing: " + str);
+                System.out.println("Missing files: " + str);
             }
+            */
+
+            DataPacket miss = new DataPacket();
+            miss.missingFileListPackets(folder, sRecv);
             
-
-
-                /*
-                if (recv.size() != 0 && (recv.get(0))[0] != 'A') { //Se não for Ack
-                    String sRecv = new String(recv.get(0), StandardCharsets.UTF_8);
-                    System.out.println("Mensagem recebida: " + sRecv);
-                    //Send ack..
-                    PacketHeader ack = new PacketHeader(1);
-                    p.sendAck(s, ip, port, ack); //Enviar Ack
-
-                }
-                else { //Se for Ack
-                    System.out.println("Packet not received.");
-                }
-            */
-            //DataPacket ack2 = p.receive(s);
-
-
-            //p.connCheck(s,ip,port,pack1, ack);
-            /*
-            SimplePacket pack3 = missingFiles(message,sRecv);  
-            p.send(s, ip, port, pack3);
-
-            SimplePacket pack4 = p.receive(s);
-            pack4.printSimplePacket();
-
-            //Send missing files...
-            //Receive missing files...
-            */
+                
         } catch (Exception e) {
             System.err.println(e);
         }

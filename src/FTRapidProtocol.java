@@ -12,8 +12,7 @@ public class FTRapidProtocol {
         s.setSoTimeout(3000);
         byte[] ack = receive(s); 
         Packet pAck = Packet.fromBytes(ack);
-        if (pAck.getSeqNum() == 1) {
-            sendAck(s, hostS, port, p);
+        if (pAck.getSeqNum() == 0) {
             System.out.println("Connection Established");
         }
     }
