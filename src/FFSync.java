@@ -1,4 +1,5 @@
 import java.net.DatagramSocket;
+import java.nio.charset.StandardCharsets;
 
 public class FFSync {
     public static void main(String args[]) {
@@ -19,29 +20,43 @@ public class FFSync {
             DataPacket my_files = new DataPacket();
             my_files.fileListPackets(folder); //List of files in folder
             
-            String allFragments = p.sendListOfPackages(s, ip, port, my_files);
-        
+            DataPacket allFragments = p.sendListOfPackages(s, ip, port, my_files);
+            //System.out.println("All fragments done: " + allFragments.length());
+            byte[] res = allFragments.unifyBytes();
+
+            String allFragmentsStr = new String(res, StandardCharsets.UTF_8);
             
-            /*
-            String[] resultt = sRecv.split("\u001C");
+            /*´
+            String[] resultt = allFragments.split("\u001C");
             for(String str: resultt){
                 System.out.println("File: " + str);
             }
             */
 
-            /*
-            //Os ficheiros que me faltam
-            String missing_files = FileInfo.missingFiles(folder, sRecv);
-            String[] result = missing_files.split("\u001C");
-            for(String str: result){
-                System.out.println("Missing files: " + str);
-            }
-            */
-
-            DataPacket miss = new DataPacket();
-            miss.missingFileListPackets(folder, allFragments);
-            String receivedPackages = p.sendListOfPackages(s, ip, port, miss);
             
+            //Os ficheiros que me faltam
+            String missing_files = FileInfo.missingFiles(folder, allFragmentsStr);
+            if (missing_files.length() != 0) {
+                String[] result = missing_files.split("\u001C");
+                for(String str: result){
+                    System.out.println("Missing files to send: " + str);
+                }
+            }    
+            else {
+                System.out.println("No files needed to send");
+            }
+            
+            DataPacket miss = new DataPacket();
+            miss.missingFileListPackets(folder, allFragmentsStr);
+
+            DataPacket receivedPackages = p.sendListOfPackages(s, ip, port, miss);
+            byte[] res1 = receivedPackages.unifyBytes();
+
+            String result = new String(res1, StandardCharsets.UTF_8);
+             
+
+            System.out.println("Going in");
+            p.sendNReceiveFiles(s, ip, port, result, folder, allFragments.getPackets().size());
             
             
 

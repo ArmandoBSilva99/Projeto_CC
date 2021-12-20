@@ -47,6 +47,7 @@ public class FileInfo {
 
     public static Map<String, FileInfo> parse(String s) throws DateTimeParseException {
         Map<String, FileInfo> res = new HashMap<>();
+        if (s.length() == 0) return res;
         String[] strings = s.split(FileInfo.file_separator);
 
         for (String string : strings) {
@@ -60,7 +61,9 @@ public class FileInfo {
     }
 
     public static String missingFiles(String local_filepath, String received_file_list) throws IOException {
+        System.out.println("Parsing");
         Map<String, FileInfo> received_file_map = parse(received_file_list);
+        System.out.println("Parsing done");
         Map<String, FileInfo> local_files = getDirFileInfo(local_filepath);
 
         List<FileInfo> difFiles = compareFiles(received_file_map, local_files);

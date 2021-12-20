@@ -46,6 +46,13 @@ public class Packet {
         return this.npack;
     }
 
+    public int getSize(){
+        return this.size;
+    }
+
+    public String getNome(){
+        return this.nome;
+    }
 
     public byte[] toBytes() throws IOException {
 
@@ -86,7 +93,7 @@ public class Packet {
             nome = isr.readUTF();
 
         int seqnum = isr.readInt();
-        if (id != 'A')
+        if (id != 'A' && size != 0)
             isr.read(data, 0, size);
         isr.close();
 

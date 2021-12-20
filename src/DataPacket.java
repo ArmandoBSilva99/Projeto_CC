@@ -36,6 +36,8 @@ public class DataPacket {
             min_packet_size = Math.min((file_size - i * data_packet_size), data_packet_size);
             data.write(file, i * data_packet_size, min_packet_size);
 
+            if (data.toByteArray().length == 0) npack = 0;
+
             Packet p = new Packet(min_packet_size, npack, nome, i, data.toByteArray());
 
             this.packets.add(p.toBytes());
@@ -64,6 +66,7 @@ public class DataPacket {
             min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
             data.write(list, i * data_packet_size, min_packet_size);
             byte[] data_packet = data.toByteArray();
+            if (data.toByteArray().length == 0) npack = 0;
 
             Packet fh = new Packet('L', min_packet_size, npack, i, data_packet);
             this.packets.add(fh.toBytes());
@@ -87,7 +90,7 @@ public class DataPacket {
             min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
             data.write(missing_files, i * data_packet_size, min_packet_size);
             byte[] data_packet = data.toByteArray();
-
+            if (data.toByteArray().length == 0) npack = 0;
             Packet fh = new Packet('L', min_packet_size, npack, i, data_packet);
             this.packets.add(fh.toBytes());
         }
@@ -96,14 +99,36 @@ public class DataPacket {
     //Mudar
     public byte[] unifyBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
         for (byte[] m : this.packets) {
             Packet p = Packet.fromBytes(m);
 
             baos.write(p.getData());
         }
+
         byte[] res = baos.toByteArray();
+
         baos.flush();
         baos.close();
+
         return res;
+    }
+
+
+    public void dataPacketToFile(String filepath) throws IOException{
+        Packet name = Packet.fromBytes(this.packets.get(0));
+        byte[] unified = this.unifyBytes();
+        try {
+            System.out.println(filepath + "/" + name.getNome());
+            File outputFile = new File(filepath + "/" + name.getNome());
+            outputFile.createNewFile();
+            FileOutputStream fos = new FileOutputStream(outputFile);
+            fos.write(unified);
+            fos.flush();
+            fos.close();
+        }
+        catch (Exception e){
+
+        }    
     }
 }
