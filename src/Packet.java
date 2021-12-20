@@ -9,6 +9,10 @@ public class Packet {
     private int seqnum;
     private byte[] data;
 
+
+    public Packet(char id){
+        this.id = id;
+    }
     // packet for file
     public Packet(int size, int npack, String nome, int seqnum, byte[] data) {
         this.id = 'F';
@@ -38,6 +42,10 @@ public class Packet {
         return this.seqnum;
     }
 
+    public char getId(){
+        return this.id;
+    }
+
     public byte[] getData() {
         return this.data;
     }
@@ -60,14 +68,17 @@ public class Packet {
         DataOutputStream dos = new DataOutputStream(baos);
 
         dos.write(id);
-        if (id != 'A') {
+        if (id != 'A' && id != 'M') {
             dos.writeInt(size);
             dos.writeInt(npack);
         }
         if (id == 'F')
             dos.writeUTF(nome);
-        dos.writeInt(seqnum);
-        if (id != 'A')
+
+        if (id != 'M')
+            dos.writeInt(seqnum);
+
+        if (id != 'A' && id != 'M')
             dos.write(data);
 
         dos.flush();
@@ -83,21 +94,31 @@ public class Packet {
         String nome = null;
         int npack = 0;
         int size = 0;
+        int seqnum = 0;
+        
         char id = (char) isr.readByte();
-        if (id != 'A') {
+        
+        if (id != 'A' && id != 'M') {
             size = isr.readInt();
             data = new byte[size];
             npack = isr.readInt();
         }
+        
         if (id == 'F')
             nome = isr.readUTF();
+        
+        if (id != 'M')
+            seqnum = isr.readInt();
 
-        int seqnum = isr.readInt();
-        if (id != 'A' && size != 0)
+        if (id != 'A' && size != 0 && id != 'M')
             isr.read(data, 0, size);
+        
         isr.close();
 
         Packet res;
+        if (id == 'M'){
+            res = new Packet(id);
+        }    
         if (id == 'F')
             res = new Packet(size, npack, nome, seqnum, data);
         if (id == 'A')

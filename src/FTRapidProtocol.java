@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
-import javax.xml.crypto.Data;
 
 public class FTRapidProtocol {
 
@@ -48,39 +47,48 @@ public class FTRapidProtocol {
     }
 
     public DataPacket sendListOfPackages(DatagramSocket s, String ip, int port, DataPacket my_files) throws IOException{
+        
         DataPacket allFragments = new DataPacket();
 
         int their_file_max = 10000; //Tamanho arbitrário que depois é alterado no for (numero de acks a dar)
+        System.out.println("Going in for size");
         int file_max = my_files.getPackets().size();
+        System.out.println("Going in if");
         
+        byte[] m = my_files.getPackets().get(0);
         
-        Packet temp = Packet.fromBytes(my_files.getPackets().get(0));
+        Packet temp = Packet.fromBytes(m);
+        
+        System.out.println("Going in if if");
         if (temp.getData().length == 0) file_max = 0;
         
+        System.out.println("Going in for");
 
         for(int i = 0, j = 0; (i < file_max || j < their_file_max);){
 
             s.setSoTimeout(500);
-            //System.out.println("filemax " + file_max + " theirfilemax: " + their_file_max);
+            System.out.println("filemax " + file_max + " i: " + i);
             
-            if (i < file_max || (file_max == 0 && i == 0)) {  
-                //System.out.println("Ready to Send");
-                send(s, ip, port, my_files, i); //Envia enquanto houver partições para enviar
-                //System.out.println("Sending");
+            if (i < file_max || (file_max == 0 && i == 0)) {
+                    System.out.println("Ready to Send");
+                    send(s, ip, port, my_files, i); //Envia enquanto houver partições para enviar
+                    //System.out.println("Sending");  
             }    
             
             boolean ackreceived = false; //Booleano que verifica se recebeu o ack
             boolean filereceived = false; //Booleano que verifica se recebeu o ficheiro 
 
+            System.out.println("Going in while");
             while ((!ackreceived) || (!filereceived)) {
                
                 try {
                     byte[] frag = receive(s);
-                    if (frag[0] != 'A') { //Se não for Ack, então é o file dele
+                    Packet packk = Packet.fromBytes(frag);
+                    if (packk.getId() != 'A') { //Se não for Ack, então é o file dele
                         System.out.println("Got file");
                         j++;
                         
-                        Packet packk1 = Packet.fromBytes(frag);
+                        //Packet packk = Packet.fromBytes(frag);
                         //System.out.println("from Bytes");
                         //System.out.println("Got it file " + packk1.getSeqNum()); //Debugging
 
@@ -89,9 +97,9 @@ public class FTRapidProtocol {
                         System.out.println("File: " + rev);
                         */
 
-                        their_file_max = packk1.getNPack();   
+                        their_file_max = packk.getNPack();   
                         
-                        Packet myAck = new Packet(packk1.getSeqNum());
+                        Packet myAck = new Packet(packk.getSeqNum());
                         sendAck(s, ip, port, myAck); 
                         allFragments.getPackets().add(frag);
 
@@ -101,14 +109,14 @@ public class FTRapidProtocol {
                             ackreceived = true;
 
                     }
-                    if (frag[0] == 'A'){ //Recebi um Ack  
+                    if (packk.getId() == 'A'){ //Recebi um Ack  
                         //System.out.println("Got Ack");
-                        Packet packk2 = Packet.fromBytes(frag);
+                       //Packet packk2 = Packet.fromBytes(frag);
                         //System.out.println("from Bytes");
                         //System.out.println("Got it Ack " + packk2.getSeqNum()); //Debugging
                         
                         //System.out.println("Accessing if");
-                        if (i == packk2.getSeqNum()){
+                        if (i == packk.getSeqNum()){
                             ackreceived = true;
                         //    System.out.println("If Accessed");
                         }    
@@ -132,12 +140,7 @@ public class FTRapidProtocol {
                 
             }    
         }
-        
-
-    
-
-            return allFragments;
-            
+        return allFragments;    
     }
 
     public void sendNReceiveFiles(DatagramSocket ds, String ip, int port, String str_files, String filepath, int nPack) throws IOException{
@@ -157,15 +160,19 @@ public class FTRapidProtocol {
                 i++;
             }
         }
+        
         if (i < nPack) {
             System.out.println("in second if");
             DataPacket a = new DataPacket();
-            System.out.println("apos datapaket A");
+            Packet mis = new Packet('M');
+            System.out.println("To bytes");
+            a.getPackets().add(mis.toBytes()); 
+            System.out.println("sendListOfPackages");
             DataPacket b = sendListOfPackages(ds, ip, port, a);
-            System.out.println("apos datapaket A");
+            System.out.println("apos datapacket B");
             b.dataPacketToFile(filepath);
-            System.out.println("apos datapaket to file");
-            i++;
+            System.out.println("apos datapacket to file");
         }
+        
     }
 }    
