@@ -48,6 +48,7 @@ public class DataPacket {
         StringBuilder sb = new StringBuilder();
 
         Map<String, FileInfo> files = FileInfo.getDirFileInfo(filepath);
+    
         files.values().forEach(fileInfo -> sb.append(fileInfo.toString())); // talvez funcione testar ??
 
         ByteArrayOutputStream data = new ByteArrayOutputStream();

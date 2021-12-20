@@ -1,5 +1,4 @@
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 
 public class Packet {
@@ -35,8 +34,16 @@ public class Packet {
         this.seqnum = seqnum;
     }
 
+    public int getSeqNum(){
+        return this.seqnum;
+    }
+
     public byte[] getData() {
         return this.data;
+    }
+
+    public int getNPack() {
+        return this.npack;
     }
 
 
@@ -72,7 +79,6 @@ public class Packet {
         char id = (char) isr.readByte();
         if (id != 'A') {
             size = isr.readInt();
-            System.out.println("Reading size: " + size);
             data = new byte[size];
             npack = isr.readInt();
         }
@@ -83,8 +89,6 @@ public class Packet {
         if (id != 'A')
             isr.read(data, 0, size);
         isr.close();
-        String sRecv = new String(b, StandardCharsets.UTF_8);
-
 
         Packet res;
         if (id == 'F')

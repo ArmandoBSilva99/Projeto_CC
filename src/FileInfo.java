@@ -75,7 +75,7 @@ public class FileInfo {
 
     private static List<FileInfo> compareFiles(Map<String, FileInfo> local_files, Map<String, FileInfo> received_files) {
         List<FileInfo> files = new ArrayList<>();
-        for (Map.Entry entry : received_files.entrySet()) {
+        for (Map.Entry<String,FileInfo> entry : received_files.entrySet()) {
             if (!local_files.containsKey(entry.getKey()))
                 files.add(received_files.get(entry.getKey()));
             else {

@@ -2,37 +2,38 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 
 public class FTRapidProtocol {
 
-    /*
-    //To establish connection
-    public void connCheck(DatagramSocket s, String hostS, int port, DataPacket p, DataPacket ack) throws IOException{
-        
-        System.out.println("Not Acknowledged\nSending again...");
-        send(s, hostS, port, p);
-
-        System.out.println("Connection Established");
-        
+    
+    //To establish connection (Mandar merdas random só para estabelecer conexão)
+    public void connCheck(DatagramSocket s, String hostS, int port, Packet p) throws IOException{
+        sendAck(s, hostS, port, p);
+        s.setSoTimeout(3000);
+        byte[] ack = receive(s); 
+        Packet pAck = Packet.fromBytes(ack);
+        if (pAck.getSeqNum() == 1) {
+            sendAck(s, hostS, port, p);
+            System.out.println("Connection Established");
+        }
     }
-    */
+    
     
     //Send Packets
     public void send(DatagramSocket s, String hostS, int port, DataPacket p, int index) throws IOException{
         InetAddress host = InetAddress.getByName(hostS);
-        System.out.println("Servidor a enviar para " + host);
+        //System.out.println("Servidor a enviar para " + host);
         byte[] m = p.getPackets().get(index);
         s.send(new DatagramPacket(m, m.length, host, port));
     }
 
     public void sendAck(DatagramSocket s, String hostS, int port, Packet p) throws IOException{
         InetAddress host = InetAddress.getByName(hostS);
-        System.out.println("Servidor a enviar para " + host);
+        //System.out.println("Servidor a enviar para " + host);
         byte[] m = p.toBytes();
-        System.out.println("In bytes ready to send");
+        //System.out.println("In bytes ready to send");
         s.send(new DatagramPacket(m, m.length, host, port));      
-        System.out.println("Sent");  
+        //System.out.println("Sent");  
     }
 
     //Receive Packets
