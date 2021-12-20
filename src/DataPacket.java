@@ -21,7 +21,7 @@ public class DataPacket {
 
     public void filePackets(String filepath) throws IOException {
         File f = new File(filepath);
-        byte[] file = Files.readAllBytes(Paths.get(f.getPath())); // talvez mudar para absolute path!
+        byte[] file = Files.readAllBytes(Paths.get(filepath).toAbsolutePath()); // talvez mudar para absolute path!
         ByteArrayOutputStream data = new ByteArrayOutputStream();
 
         int file_size = (int) f.length();
@@ -116,11 +116,11 @@ public class DataPacket {
 
 
     public void dataPacketToFile(String filepath) throws IOException{
-        Packet name = Packet.fromBytes(this.packets.get(0));
+        //Packet name = Packet.fromBytes(this.packets.get(0));
         byte[] unified = this.unifyBytes();
         try {
-            System.out.println(filepath + "/" + name.getNome());
-            File outputFile = new File(filepath + "/" + name.getNome());
+            //System.out.println(filepath + "/" + name.getNome());
+            File outputFile = new File(filepath);
             outputFile.createNewFile();
             FileOutputStream fos = new FileOutputStream(outputFile);
             fos.write(unified);

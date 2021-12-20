@@ -144,19 +144,27 @@ public class FTRapidProtocol {
         int i = 0;
         if (str_files.length() != 0) {
             String[] splitted = str_files.split(FileInfo.file_separator);
+            System.out.println("Split");
             for(String s: splitted) {
                 DataPacket file = new DataPacket();
                 String res = filepath + "/" + s;
+                System.out.println("res: " + res);
                 file.filePackets(res);
                 DataPacket new_file = sendListOfPackages(ds, ip, port, file);
+                System.out.println("Before file");
                 new_file.dataPacketToFile(filepath);
+                System.out.println("New file");
                 i++;
             }
         }
         if (i < nPack) {
+            System.out.println("in second if");
             DataPacket a = new DataPacket();
+            System.out.println("apos datapaket A");
             DataPacket b = sendListOfPackages(ds, ip, port, a);
+            System.out.println("apos datapaket A");
             b.dataPacketToFile(filepath);
+            System.out.println("apos datapaket to file");
             i++;
         }
     }

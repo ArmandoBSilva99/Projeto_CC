@@ -21,7 +21,7 @@ public class FFSync {
             my_files.fileListPackets(folder); //List of files in folder
             
             DataPacket allFragments = p.sendListOfPackages(s, ip, port, my_files);
-            //System.out.println("All fragments done: " + allFragments.length());
+            //System.out.println("All fragments done: ");
             byte[] res = allFragments.unifyBytes();
 
             String allFragmentsStr = new String(res, StandardCharsets.UTF_8);
@@ -56,7 +56,7 @@ public class FFSync {
              
 
             System.out.println("Going in");
-            p.sendNReceiveFiles(s, ip, port, result, folder, allFragments.getPackets().size());
+            p.sendNReceiveFiles(s, ip, port, missing_files, folder, allFragments.getPackets().size());
             
             
 
