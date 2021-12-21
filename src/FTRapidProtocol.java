@@ -51,26 +51,28 @@ public class FTRapidProtocol {
         DataPacket allFragments = new DataPacket();
 
         int their_file_max = 10000; //Tamanho arbitrário que depois é alterado no for (numero de acks a dar)
-        System.out.println("Going in for size");
+        //System.out.println("Going in for size");
         int file_max = my_files.getPackets().size();
-        System.out.println("Going in if");
+        //System.out.println("Going in if");
         
         byte[] m = my_files.getPackets().get(0);
-        
         Packet temp = Packet.fromBytes(m);
         
-        System.out.println("Going in if if");
-        if (temp.getData().length == 0) file_max = 0;
+        //System.out.println("Going in if if");
+        //System.out.println("data:" + temp.getData());
+        //System.out.println("tamanho data:" + temp.getData().length);
+        //if (temp.getData().length == 0) file_max = 0;
+        if(temp.getData() == null) file_max = 0;
         
-        System.out.println("Going in for");
+        //System.out.println("Going in for");
 
         for(int i = 0, j = 0; (i < file_max || j < their_file_max);){
 
             s.setSoTimeout(500);
-            System.out.println("filemax " + file_max + " i: " + i);
+            //System.out.println("filemax " + file_max + " i: " + i);
             
             if (i < file_max || (file_max == 0 && i == 0)) {
-                    System.out.println("Ready to Send");
+                    //System.out.println("Ready to Send");
                     send(s, ip, port, my_files, i); //Envia enquanto houver partições para enviar
                     //System.out.println("Sending");  
             }    
@@ -78,7 +80,7 @@ public class FTRapidProtocol {
             boolean ackreceived = false; //Booleano que verifica se recebeu o ack
             boolean filereceived = false; //Booleano que verifica se recebeu o ficheiro 
 
-            System.out.println("Going in while");
+            //System.out.println("Going in while");
             while ((!ackreceived) || (!filereceived)) {
                
                 try {
@@ -145,34 +147,36 @@ public class FTRapidProtocol {
 
     public void sendNReceiveFiles(DatagramSocket ds, String ip, int port, String str_files, String filepath, int nPack) throws IOException{
         int i = 0;
+
         if (str_files.length() != 0) {
             String[] splitted = str_files.split(FileInfo.file_separator);
-            System.out.println("Split");
+            //System.out.println("Split");
             for(String s: splitted) {
                 DataPacket file = new DataPacket();
                 String res = filepath + "/" + s;
-                System.out.println("res: " + res);
+                //System.out.println("res: " + res);
                 file.filePackets(res);
                 DataPacket new_file = sendListOfPackages(ds, ip, port, file);
-                System.out.println("Before file");
+                //System.out.println("Before file");
                 new_file.dataPacketToFile(filepath);
-                System.out.println("New file");
+                //System.out.println("New file");
                 i++;
+                System.out.println("i: " + i);
             }
         }
-        
-        if (i < nPack) {
-            System.out.println("in second if");
+        while (i < nPack) {
+            //System.out.println("in second if");
             DataPacket a = new DataPacket();
             Packet mis = new Packet('M');
-            System.out.println("To bytes");
+            //System.out.println("To bytes");
             a.getPackets().add(mis.toBytes()); 
-            System.out.println("sendListOfPackages");
+            //System.out.println("sendListOfPackages");
             DataPacket b = sendListOfPackages(ds, ip, port, a);
-            System.out.println("apos datapacket B");
+            //System.out.println("apos datapacket B");
             b.dataPacketToFile(filepath);
+            i++;
+            System.out.println("i: " + i);
             System.out.println("apos datapacket to file");
         }
-        
     }
 }    

@@ -55,8 +55,10 @@ public class FFSync {
             String result = new String(res1, StandardCharsets.UTF_8);
              
 
-            System.out.println("Going in");
-            p.sendNReceiveFiles(s, ip, port, missing_files, folder, allFragments.getPackets().size());
+            System.out.println("Going in"); 
+            int size = allFragmentsStr.split(FileInfo.file_separator).length;
+            System.out.println("Size: " + size);
+            p.sendNReceiveFiles(s, ip, port, missing_files, folder, size);
             
             
 

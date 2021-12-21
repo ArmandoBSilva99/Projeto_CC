@@ -102,8 +102,12 @@ public class DataPacket {
 
         for (byte[] m : this.packets) {
             Packet p = Packet.fromBytes(m);
+            System.out.println("After fromBytes");
 
-            baos.write(p.getData());
+            if(p.getData() != null)
+                baos.write(p.getData());
+            
+            System.out.println("after write");
         }
 
         byte[] res = baos.toByteArray();
@@ -117,7 +121,9 @@ public class DataPacket {
 
     public void dataPacketToFile(String filepath) throws IOException{
         //Packet name = Packet.fromBytes(this.packets.get(0));
+        System.out.println("Before unified");
         byte[] unified = this.unifyBytes();
+        System.out.println("After unified");
         try {
             //System.out.println(filepath + "/" + name.getNome());
             File outputFile = new File(filepath);

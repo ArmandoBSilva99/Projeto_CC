@@ -118,13 +118,27 @@ public class Packet {
         Packet res;
         if (id == 'M'){
             res = new Packet(id);
+            //System.out.println("Meu ID: " + res.getId());
         }    
-        if (id == 'F')
+        
+        else if (id == 'F')
             res = new Packet(size, npack, nome, seqnum, data);
-        if (id == 'A')
+        else if (id == 'A')
             res = new Packet(seqnum);
         else
             res = new Packet(id, size, npack, seqnum, data);
+
+        //System.out.println("Apos os IDs");
+
+        if(id == 'M') {
+
+        System.out.println("ID: " + res.getId());
+        //System.out.println("Size: " + res.getSize());
+        //System.out.println("NPack: " + res.getNPack());
+        //System.out.println("Seqnum: " + res.getSeqNum());
+        System.out.println("Data: " + res.getData());
+
+        }
 
         return res;
     }
