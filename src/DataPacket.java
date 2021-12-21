@@ -125,13 +125,17 @@ public class DataPacket {
         byte[] unified = this.unifyBytes();
         System.out.println("After unified");
         try {
-            //System.out.println(filepath + "/" + name.getNome());
-            File outputFile = new File(filepath);
-            outputFile.createNewFile();
-            FileOutputStream fos = new FileOutputStream(outputFile);
-            fos.write(unified);
-            fos.flush();
-            fos.close();
+            
+            byte[] s = this.packets.get(0);
+            Packet ps = Packet.fromBytes(s);
+            if (ps.getNome() != null) {
+                File outputFile = new File(filepath + "/" + ps.getNome());
+                outputFile.createNewFile();
+                FileOutputStream fos = new FileOutputStream(outputFile);
+                fos.write(unified);
+                fos.flush();
+                fos.close();
+            }
         }
         catch (Exception e){
 

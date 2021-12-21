@@ -29,7 +29,7 @@ public class Packet {
         this.size = size;
         this.npack = npack;
         this.seqnum = seqnum;
-        this.data = data.clone();
+        this.data = data;
     }
 
     // packet for ack
