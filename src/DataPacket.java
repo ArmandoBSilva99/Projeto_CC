@@ -9,13 +9,13 @@ import java.util.Map;
 
 public class DataPacket {
     public static final int packet_size = 1420;
-    private List<byte[]> packets;  //Mudar para List<PacketHeader>
+    private List<Packet> packets;  //Mudar para List<PacketHeader>
 
     public DataPacket() {
         packets = new ArrayList<>();
     }
 
-    public List<byte[]> getPackets() {
+    public List<Packet> getPackets() {
         return packets;
     }
 
@@ -40,7 +40,7 @@ public class DataPacket {
 
             Packet p = new Packet(min_packet_size, npack, nome, i, data.toByteArray());
 
-            this.packets.add(p.toBytes());
+            this.packets.add(p);
         }
     }
 
@@ -68,8 +68,8 @@ public class DataPacket {
             byte[] data_packet = data.toByteArray();
             if (data.toByteArray().length == 0) npack = 0;
 
-            Packet fh = new Packet('L', min_packet_size, npack, i, data_packet);
-            this.packets.add(fh.toBytes());
+            Packet fh = new Packet(Packet.LIST_ID, min_packet_size, npack, i, data_packet);
+            this.packets.add(fh);
         }
     }
 
@@ -91,8 +91,8 @@ public class DataPacket {
             data.write(missing_files, i * data_packet_size, min_packet_size);
             byte[] data_packet = data.toByteArray();
             if (data.toByteArray().length == 0) npack = 0;
-            Packet fh = new Packet('L', min_packet_size, npack, i, data_packet);
-            this.packets.add(fh.toBytes());
+            Packet fh = new Packet(Packet.LIST_ID, min_packet_size, npack, i, data_packet);
+            this.packets.add(fh);
         }
     }
 
@@ -100,14 +100,13 @@ public class DataPacket {
     public byte[] unifyBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        for (byte[] m : this.packets) {
-            Packet p = Packet.fromBytes(m);
-            System.out.println("After fromBytes");
+        for (Packet p : this.packets) {
+            //System.out.println("After fromBytes");
 
             if(p.getData() != null)
                 baos.write(p.getData());
             
-            System.out.println("after write");
+            //System.out.println("after write");
         }
 
         byte[] res = baos.toByteArray();
@@ -121,13 +120,12 @@ public class DataPacket {
 
     public void dataPacketToFile(String filepath) throws IOException{
         //Packet name = Packet.fromBytes(this.packets.get(0));
-        System.out.println("Before unified");
+        //System.out.println("Before unified");
         byte[] unified = this.unifyBytes();
-        System.out.println("After unified");
+        //System.out.println("After unified");
         try {
             
-            byte[] s = this.packets.get(0);
-            Packet ps = Packet.fromBytes(s);
+            Packet ps = this.packets.get(0);
             if (ps.getNome() != null) {
                 File outputFile = new File(filepath + "/" + ps.getNome());
                 outputFile.createNewFile();

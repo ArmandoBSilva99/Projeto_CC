@@ -16,7 +16,7 @@ public class FFSync {
         try {
             s = new DatagramSocket(port);
             Packet packConn = new Packet(0);
-            p.connCheck(s, ip, port, packConn); //Começa a conexão, i.e, verifica se estão comunicáveis 
+            if (p.connCheck(s, ip, port, packConn) == -1) return; //Começa a conexão, i.e, verifica se estão comunicáveis 
             DataPacket my_files = new DataPacket();
             my_files.fileListPackets(folder); //List of files in folder
             
@@ -25,14 +25,6 @@ public class FFSync {
             byte[] res = allFragments.unifyBytes();
 
             String allFragmentsStr = new String(res, StandardCharsets.UTF_8);
-            
-            /*´
-            String[] resultt = allFragments.split("\u001C");
-            for(String str: resultt){
-                System.out.println("File: " + str);
-            }
-            */
-
             
             //Os ficheiros que me faltam
             String missing_files = FileInfo.missingFiles(folder, allFragmentsStr);
@@ -55,9 +47,9 @@ public class FFSync {
             String result = new String(res1, StandardCharsets.UTF_8);
              
 
-            System.out.println("Going in"); 
+            //System.out.println("Going in"); 
             int size = allFragmentsStr.split(FileInfo.file_separator).length;
-            System.out.println("Size: " + size);
+            //System.out.println("Size: " + size);
             p.sendNReceiveFiles(s, ip, port, missing_files, folder, size);
             
             

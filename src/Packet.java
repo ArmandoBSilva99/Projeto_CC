@@ -2,6 +2,11 @@ import java.io.*;
 
 
 public class Packet {
+    public static final char ACK_ID = 'A';
+    public static final char FILE_ID = 'F';
+    public static final char MISSING_ID = 'M';
+    public static final char LIST_ID = 'L'; 
+    public static final char PASS_ID = 'P';
     private char id;
     private int size;
     private int npack;
@@ -15,7 +20,7 @@ public class Packet {
     }
     // packet for file
     public Packet(int size, int npack, String nome, int seqnum, byte[] data) {
-        this.id = 'F';
+        this.id = FILE_ID;
         this.size = size;
         this.nome = nome;
         this.npack = npack;
@@ -34,7 +39,7 @@ public class Packet {
 
     // packet for ack
     public Packet(int seqnum) {
-        this.id = 'A';
+        this.id = ACK_ID;
         this.seqnum = seqnum;
     }
 
@@ -68,17 +73,17 @@ public class Packet {
         DataOutputStream dos = new DataOutputStream(baos);
 
         dos.write(id);
-        if (id != 'A' && id != 'M') {
+        if (id != ACK_ID && id != MISSING_ID) {
             dos.writeInt(size);
             dos.writeInt(npack);
         }
-        if (id == 'F')
+        if (id == FILE_ID)
             dos.writeUTF(nome);
 
-        if (id != 'M')
+        if (id != MISSING_ID)
             dos.writeInt(seqnum);
 
-        if (id != 'A' && id != 'M')
+        if (id != ACK_ID && id != MISSING_ID)
             dos.write(data);
 
         dos.flush();
@@ -98,39 +103,39 @@ public class Packet {
         
         char id = (char) isr.readByte();
         
-        if (id != 'A' && id != 'M') {
+        if (id != ACK_ID && id != MISSING_ID) {
             size = isr.readInt();
             data = new byte[size];
             npack = isr.readInt();
         }
         
-        if (id == 'F')
+        if (id == FILE_ID)
             nome = isr.readUTF();
         
-        if (id != 'M')
+        if (id != MISSING_ID)
             seqnum = isr.readInt();
 
-        if (id != 'A' && size != 0 && id != 'M')
+        if (id != ACK_ID && size != 0 && id != MISSING_ID)
             isr.read(data, 0, size);
         
         isr.close();
 
         Packet res;
-        if (id == 'M'){
+        if (id == MISSING_ID){
             res = new Packet(id);
             //System.out.println("Meu ID: " + res.getId());
         }    
         
-        else if (id == 'F')
+        else if (id == FILE_ID)
             res = new Packet(size, npack, nome, seqnum, data);
-        else if (id == 'A')
+        else if (id == ACK_ID)
             res = new Packet(seqnum);
         else
             res = new Packet(id, size, npack, seqnum, data);
 
         //System.out.println("Apos os IDs");
 
-        if(id == 'M') {
+        if(id == MISSING_ID) {
 
         System.out.println("ID: " + res.getId());
         //System.out.println("Size: " + res.getSize());
