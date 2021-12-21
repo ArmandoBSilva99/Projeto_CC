@@ -137,11 +137,11 @@ public class Packet {
 
         if(id == MISSING_ID) {
 
-        System.out.println("ID: " + res.getId());
+        //System.out.println("ID: " + res.getId());
         //System.out.println("Size: " + res.getSize());
         //System.out.println("NPack: " + res.getNPack());
         //System.out.println("Seqnum: " + res.getSeqNum());
-        System.out.println("Data: " + res.getData());
+        //System.out.println("Data: " + res.getData());
 
         }
 

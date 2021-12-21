@@ -44,7 +44,6 @@ public class DataPacket {
         }
     }
 
-    //MUDAR CONTAS??
     public void fileListPackets(String filepath) throws IOException, NullPointerException {
         StringBuilder sb = new StringBuilder();
 
