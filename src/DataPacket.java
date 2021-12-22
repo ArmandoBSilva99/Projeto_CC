@@ -1,4 +1,7 @@
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,8 +47,6 @@ public class DataPacket {
             min_packet_size = Math.min((file_size - i * data_packet_size), data_packet_size);
             data.write(file, i * data_packet_size, min_packet_size);
 
-            if (data.toByteArray().length == 0) npack = 0;
-
             Packet p = new Packet(min_packet_size, npack, nome, i, data.toByteArray());
 
             this.packets.add(p);
@@ -58,7 +59,6 @@ public class DataPacket {
         Map<String, FileInfo> files = FileInfo.getDirFileInfo(filepath);
         System.out.println(files.size());
         files.values().forEach(fileInfo -> sb.append(fileInfo.toString())); // talvez funcione testar ??
-
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         byte[] list = sb.toString().getBytes(StandardCharsets.UTF_8);
 
@@ -73,7 +73,6 @@ public class DataPacket {
             min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
             data.write(list, i * data_packet_size, min_packet_size);
             byte[] data_packet = data.toByteArray();
-            if (data.toByteArray().length == 0) npack = 0;
 
             Packet fh = new Packet(Packet.LIST_ID, min_packet_size, npack, i, data_packet);
             this.packets.add(fh);
@@ -97,8 +96,7 @@ public class DataPacket {
             min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
             data.write(missing_files, i * data_packet_size, min_packet_size);
             byte[] data_packet = data.toByteArray();
-            //if (data.toByteArray().length == 0) npack = 0;
-            Packet fh = new Packet(Packet.LIST_ID, min_packet_size, npack, i, data_packet);
+            Packet fh = new Packet(Packet.MISSING_ID, min_packet_size, npack, i, data_packet);
             this.packets.add(fh);
         }
     }
@@ -107,12 +105,8 @@ public class DataPacket {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         for (Packet p : this.packets) {
-            //System.out.println("After fromBytes");
-
             if (p.getData() != null)
                 baos.write(p.getData());
-
-            //System.out.println("after write");
         }
 
         byte[] res = baos.toByteArray();

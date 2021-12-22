@@ -2,9 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ThreadPool {
-
+    ReentrantLock lock;
     private BlockingQueue<Runnable> waiting_queue = null;
     private List<WorkerThread> workerThreadList = new ArrayList<>();
     private boolean isStopped = false;

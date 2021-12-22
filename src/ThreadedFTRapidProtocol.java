@@ -3,11 +3,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 public class ThreadedFTRapidProtocol implements Runnable {
-    private static final int MIN_THREADS = 10;
-    private static final int MAX_TASKS_WAIT = 150;
+    private static final int MIN_THREADS = 15;
+    private static final int MAX_TASKS_WAIT = 60;
 
     public String filepath;
     private InetAddress ip;
@@ -38,7 +37,7 @@ public class ThreadedFTRapidProtocol implements Runnable {
             SendPackets my_file_list = new SendPackets(fileList, ip, FFSync.MAIN_PORT);
             threadPool.execute(my_file_list);
             while (true) {
-                main_socket.setSoTimeout(10000);
+                main_socket.setSoTimeout(15000);
                 byte[] received_data = new byte[DataPacket.PACKET_SIZE];
                 DatagramPacket received_packet = new DatagramPacket(received_data, DataPacket.PACKET_SIZE);
 
@@ -46,6 +45,9 @@ public class ThreadedFTRapidProtocol implements Runnable {
                 ProcessPacket processPacket = new ProcessPacket(filepath, received_packet.getData(), threadPool, packetManager, ip, received_packet.getPort());
                 threadPool.execute(processPacket);
             }
+        } catch (SocketTimeoutException e) {
+            System.out.println("yo isto bazou !! ");
+            e.printStackTrace();
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -92,19 +94,19 @@ public class ThreadedFTRapidProtocol implements Runnable {
         return false;
     }
 
-        //Receive Packets
-    public byte[] receive(DatagramSocket s) throws IOException{
+    //Receive Packets
+    public byte[] receive(DatagramSocket s) throws IOException {
         byte[] packetBytes = new byte[DataPacket.PACKET_SIZE];
         DatagramPacket dp = new DatagramPacket(packetBytes, packetBytes.length);
         s.receive(dp);
         return packetBytes;
     }
 
-    public void sendAck(DatagramSocket s, InetAddress hostS, int port, Packet p) throws IOException{
+    public void sendAck(DatagramSocket s, InetAddress hostS, int port, Packet p) throws IOException {
         //System.out.println("Servidor a enviar para " + host);
         byte[] m = p.toBytes();
         //System.out.println("In bytes ready to send");
-        s.send(new DatagramPacket(m, m.length, hostS, port));      
+        s.send(new DatagramPacket(m, m.length, hostS, port));
         //System.out.println("Sent");  
     }
 

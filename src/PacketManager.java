@@ -44,17 +44,19 @@ public class PacketManager {
 
     public void closeSocket(int port) {
         socket_lock.lock();
-        DatagramSocket s = this.open_sockets.remove(port);
-        s.close();
+        if (this.open_sockets.containsKey(port)) {
+            DatagramSocket s = this.open_sockets.remove(port);
+            s.close();
+        }
         socket_lock.unlock();
     }
 
     public DataPacket removeDataPacket(int port) {
-        try {
-            packets_lock.lock();
-            return this.packets.remove(port);
-        } finally {
-            packets_lock.unlock();
-        }
+        packets_lock.lock();
+        DataPacket res = null;
+        if (this.packets.containsKey(port))
+            res = this.packets.remove(port);
+        packets_lock.unlock();
+        return res;
     }
 }

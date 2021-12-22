@@ -71,7 +71,7 @@ public class FileInfo {
         //System.out.println("Parsing done");
         Map<String, FileInfo> local_files = getDirFileInfo(local_filepath);
 
-        List<FileInfo> difFiles = compareFiles(received_file_map, local_files);
+        List<FileInfo> difFiles = compareFiles(local_files, received_file_map);
 
         StringBuilder sb = new StringBuilder();
 
@@ -82,9 +82,9 @@ public class FileInfo {
     }
 
     private static List<FileInfo> compareFiles(Map<String, FileInfo> local_files, Map<String, FileInfo> received_files) {
-     
+
         List<FileInfo> files = new ArrayList<>();
-        for (Map.Entry<String,FileInfo> entry : received_files.entrySet()) {
+        for (Map.Entry<String, FileInfo> entry : received_files.entrySet()) {
             if (!local_files.containsKey(entry.getKey()))
                 files.add(received_files.get(entry.getKey()));
             else {

@@ -1,5 +1,6 @@
-import javax.xml.crypto.Data;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -31,36 +32,43 @@ public class ProcessPacket implements Runnable {
             Packet received = Packet.fromBytes(this.packet);
             packetManager.addPacket(port, received);
             DatagramSocket to_send = packetManager.getSocket(port);
+            System.out.println("Receiving from: " + port);
             byte[] ack = new Packet(received.getSeqNum()).toBytes();
             DatagramPacket datagramAck = new DatagramPacket(ack, ack.length, this.address, this.port);
             to_send.send(datagramAck);
-            System.out.println("seqNum: " + received.getSeqNum() + " nPack: " + received.getNPack());
-            System.out.println("file_name: " + received.getNome());
+
+            System.out.println("Receiving: " + received.getId() + " seqnum: " + received.getSeqNum() + " npack: " + received.getNPack());
+            boolean b = received.getSeqNum() == received.getNPack() - 1;
+            System.out.println("Last packet : " + b);
+
             if (received.getSeqNum() == received.getNPack() - 1) {
                 DataPacket to_process = packetManager.removeDataPacket(port);
                 packetManager.closeSocket(port);
                 if (to_process != null) {
-
                     byte[] data = to_process.unifyBytes();
+                    if (received.getId() == Packet.FILE_ID) {
+                        writeFile(received.getNome(), data);
+                    }
                     if (data != null)
-                        if (received.getId() == Packet.FILE_ID) {
-                            writeFile(received.getNome(), data);
-
-                        } else if (received.getId() == Packet.LIST_ID) {
+                        if (received.getId() == Packet.LIST_ID) {
                             String his_file_list = new String(data, StandardCharsets.UTF_8);
-                            
+
                             DataPacket missing_files = new DataPacket();
+
                             missing_files.missingFileListPackets(filepath, his_file_list);
+                            System.out.println(new String(missing_files.getPackets().get(0).getData()));
                             packetManager.makeFileInfoMap(his_file_list);
-                   
+
                             SendPackets for_thread = new SendPackets(missing_files, address, FFSync.MAIN_PORT);
+
                             threadPool.execute(for_thread);
 
                         } else if (received.getId() == Packet.MISSING_ID) {
                             String missing_files = new String(data, StandardCharsets.UTF_8);
-                            //System.out.println("missing files in else: " + missing_files);
+                            System.out.println("missing files in else: " + missing_files);
                             for (String filename : missing_files.split(FileInfo.file_separator)) {
                                 String combined_filepath = filepath + "/" + filename;
+                                System.out.println(combined_filepath);
                                 SendPackets for_thread = new SendPackets(combined_filepath, address, FFSync.MAIN_PORT);
                                 threadPool.execute(for_thread);
                             }
