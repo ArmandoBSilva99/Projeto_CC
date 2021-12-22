@@ -15,7 +15,7 @@ public class FileInfo {
 
     public FileInfo(String name, Instant creation_date, Instant modified_date) {
         this.name = name;
-        this.creation_date = creation_date;
+//        this.creation_date = creation_date;
         this.modified_date = modified_date;
     }
 

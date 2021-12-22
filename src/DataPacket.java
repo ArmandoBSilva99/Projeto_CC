@@ -8,15 +8,23 @@ import java.util.Map;
 
 
 public class DataPacket {
-    public static final int packet_size = 1420;
+    public static final int PACKET_SIZE = 1420;
     private List<Packet> packets;  //Mudar para List<PacketHeader>
 
     public DataPacket() {
         packets = new ArrayList<>();
     }
 
+    public void add(Packet p) {
+        this.packets.add(p.getSeqNum(), p);
+    }
+
     public List<Packet> getPackets() {
         return packets;
+    }
+
+    public int size() {
+        return this.packets.size();
     }
 
     public void filePackets(String filepath) throws IOException {
@@ -27,7 +35,7 @@ public class DataPacket {
         int file_size = (int) f.length();
         String nome = f.getName();
         int len_header = (nome.length() + 2) + 13;                   // 2 -> cabeçalho da writeUTF da classe DataInputStream e 13 -> 1 do id,4 do size, 4 do npack, 4 do seqnum
-        int data_packet_size = packet_size - len_header;
+        int data_packet_size = PACKET_SIZE - len_header;
         int npack = 1 + (file_size / data_packet_size);
         int min_packet_size;
 
@@ -48,7 +56,7 @@ public class DataPacket {
         StringBuilder sb = new StringBuilder();
 
         Map<String, FileInfo> files = FileInfo.getDirFileInfo(filepath);
-    
+
         files.values().forEach(fileInfo -> sb.append(fileInfo.toString())); // talvez funcione testar ??
 
         ByteArrayOutputStream data = new ByteArrayOutputStream();
@@ -56,7 +64,7 @@ public class DataPacket {
 
         int list_size = list.length;
         int len_header = 13;
-        int data_packet_size = packet_size - len_header;
+        int data_packet_size = PACKET_SIZE - len_header;
         int npack = 1 + (list_size / data_packet_size);
         int min_packet_size;
 
@@ -79,7 +87,7 @@ public class DataPacket {
 
         int list_size = missing_files.length;
         int len_header = 13;
-        int data_packet_size = packet_size - len_header;
+        int data_packet_size = PACKET_SIZE - len_header;
         int npack = 1 + (list_size / data_packet_size);
         int min_packet_size;
 
@@ -95,16 +103,15 @@ public class DataPacket {
         }
     }
 
-    //Mudar
     public byte[] unifyBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         for (Packet p : this.packets) {
             //System.out.println("After fromBytes");
 
-            if(p.getData() != null)
+            if (p.getData() != null)
                 baos.write(p.getData());
-            
+
             //System.out.println("after write");
         }
 
@@ -116,14 +123,13 @@ public class DataPacket {
         return res;
     }
 
-
-    public void dataPacketToFile(String filepath) throws IOException{
+    public void dataPacketToFile(String filepath) throws IOException {
         //Packet name = Packet.fromBytes(this.packets.get(0));
         //System.out.println("Before unified");
         byte[] unified = this.unifyBytes();
         //System.out.println("After unified");
         try {
-            
+
             Packet ps = this.packets.get(0);
             if (ps.getNome() != null) {
                 File outputFile = new File(filepath + "/" + ps.getNome());
@@ -133,9 +139,7 @@ public class DataPacket {
                 fos.flush();
                 fos.close();
             }
+        } catch (Exception e) {
         }
-        catch (Exception e){
-
-        }    
     }
 }
