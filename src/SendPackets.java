@@ -35,8 +35,7 @@ public class SendPackets implements Runnable {
             for (int i = 0; i < to_send.size() && tries < 5;) {
                 try {
                     s.setSoTimeout(10000); // Mudar
-                    System.out.println("Sending from : " + Thread.currentThread() + " " + data_packets.get(i).getId()
-                            + " " + data_packets.get(i).getSeqNum());
+                    System.out.println("Sending from : " + Thread.currentThread() + " " + data_packets.get(i).getId() + " " + data_packets.get(i).getSeqNum());
                     byte[] packet_to_send = data_packets.get(i).toBytes();
                     DatagramPacket p = new DatagramPacket(packet_to_send, packet_to_send.length, ip, port);
                     s.send(p);
@@ -55,6 +54,7 @@ public class SendPackets implements Runnable {
                     e.printStackTrace();
                 }
             }
+            s.close(); //I ADDED THIS, MIGHT WORK
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {

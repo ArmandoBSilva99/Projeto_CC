@@ -3,8 +3,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
 
 public class TCPListener implements Runnable {
+
+    private String filepath;
+
+    TCPListener(String filepath){
+        this.filepath = filepath;
+    }
 
     @Override
     public void run() {
@@ -26,9 +33,18 @@ public class TCPListener implements Runnable {
                 System.out.println("" + count + ": " + line);
                 if (line.equals("")) {
                     System.out.println("Writing response...");
+                    
+                    Map<String,FileInfo> my_files = FileInfo.getDirFileInfo(this.filepath);
+                    StringBuilder files = new StringBuilder();
+                    if (my_files.size() != 0) {
+                        for(String s: my_files.keySet()) {
+                            files.append(s + "\n");
+                        }
+                    }    
+                    else files.append("Wrong folder\n");
 
                     // need to construct response bytes first
-                    byte[] response = "<html><body>Hello World</body></html>".getBytes("ASCII");
+                    byte[] response = ("<html><body>\n" + files.toString() + "</body></html>").getBytes("ASCII");
 
                     String statusLine = "HTTP/1.1 200 OK\r\n";
                     out.write(statusLine.getBytes("ASCII"));
