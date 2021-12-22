@@ -32,8 +32,9 @@ public class SendPackets implements Runnable {
             }
 
             List<Packet> data_packets = this.to_send.getPackets();
-
+            
             for (int i = 0; i < to_send.size(); ) {
+                System.out.println("I: " + i);
                 try {
                     s.setSoTimeout(10000);                                      // Mudar
                     byte[] packet_to_send = data_packets.get(i).toBytes();
@@ -41,6 +42,7 @@ public class SendPackets implements Runnable {
                     s.send(p);
 
                     s.receive(p);
+                    System.out.println("Data Length: " + p.getData().length);
                     i++;
                 } catch (SocketTimeoutException ignored) {
 
@@ -48,6 +50,7 @@ public class SendPackets implements Runnable {
                     e.printStackTrace();
                 }
             }
+            System.out.println("Out of for");
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {

@@ -69,7 +69,7 @@ public class FTRapidProtocol {
 
     //Receive Packets
     public byte[] receive(DatagramSocket s) throws IOException{
-        byte[] packetBytes = new byte[DataPacket.packet_size];
+        byte[] packetBytes = new byte[DataPacket.PACKET_SIZE];
         DatagramPacket dp = new DatagramPacket(packetBytes, packetBytes.length);
         s.receive(dp);
         return packetBytes;

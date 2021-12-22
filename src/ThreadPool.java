@@ -5,12 +5,12 @@ import java.util.concurrent.BlockingQueue;
 
 public class ThreadPool {
 
-    private BlockingQueue waiting_queue = null;
+    private BlockingQueue<Runnable> waiting_queue = null;
     private List<WorkerThread> workerThreadList = new ArrayList<>();
     private boolean isStopped = false;
 
     public ThreadPool(int nThreads, int nMaxTasksWaiting) {
-        waiting_queue = new ArrayBlockingQueue(nMaxTasksWaiting);
+        waiting_queue = new ArrayBlockingQueue<>(nMaxTasksWaiting);
 
         for (int i = 0; i < nThreads; i++) {
             WorkerThread workerThread =

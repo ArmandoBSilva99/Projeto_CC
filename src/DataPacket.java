@@ -56,7 +56,7 @@ public class DataPacket {
         StringBuilder sb = new StringBuilder();
 
         Map<String, FileInfo> files = FileInfo.getDirFileInfo(filepath);
-
+        System.out.println(files.size());
         files.values().forEach(fileInfo -> sb.append(fileInfo.toString())); // talvez funcione testar ??
 
         ByteArrayOutputStream data = new ByteArrayOutputStream();
@@ -97,7 +97,7 @@ public class DataPacket {
             min_packet_size = Math.min((list_size - i * data_packet_size), data_packet_size);
             data.write(missing_files, i * data_packet_size, min_packet_size);
             byte[] data_packet = data.toByteArray();
-            if (data.toByteArray().length == 0) npack = 0;
+            //if (data.toByteArray().length == 0) npack = 0;
             Packet fh = new Packet(Packet.LIST_ID, min_packet_size, npack, i, data_packet);
             this.packets.add(fh);
         }
