@@ -32,10 +32,11 @@ public class SendPackets implements Runnable {
 
             List<Packet> data_packets = this.to_send.getPackets();
             int tries = 0;
-            for (int i = 0; i < to_send.size() && tries < 5; ) {
+            for (int i = 0; i < to_send.size() && tries < 5;) {
                 try {
-                    s.setSoTimeout(10000);                                      // Mudar
-                    System.out.println("Sending from : " + Thread.currentThread() + " " + data_packets.get(i).getId() + " " + data_packets.get(i).getSeqNum());
+                    s.setSoTimeout(10000); // Mudar
+                    System.out.println("Sending from : " + Thread.currentThread() + " " + data_packets.get(i).getId()
+                            + " " + data_packets.get(i).getSeqNum());
                     byte[] packet_to_send = data_packets.get(i).toBytes();
                     DatagramPacket p = new DatagramPacket(packet_to_send, packet_to_send.length, ip, port);
                     s.send(p);
@@ -43,7 +44,8 @@ public class SendPackets implements Runnable {
                         System.out.println("Filename: " + data_packets.get(i).getNome());
                     DatagramPacket ack = new DatagramPacket(new byte[DataPacket.PACKET_SIZE], DataPacket.PACKET_SIZE);
                     s.receive(ack);
-                    System.out.println("ACK " + Packet.fromBytes(p.getData()).getId() + " " + Packet.fromBytes(p.getData()).getSeqNum());
+                    System.out.println("ACK " + Packet.fromBytes(p.getData()).getId() + " "
+                            + Packet.fromBytes(p.getData()).getSeqNum());
                     i++;
                     System.out.println("Data Length: " + p.getData().length);
                 } catch (SocketTimeoutException ignored) {

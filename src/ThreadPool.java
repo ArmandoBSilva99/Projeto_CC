@@ -14,9 +14,6 @@ public class ThreadPool {
         waiting_queue = new ArrayBlockingQueue<>(nMaxTasksWaiting);
 
         for (int i = 0; i < nThreads; i++) {
-            WorkerThread workerThread =
-                    new WorkerThread(waiting_queue);
-
             workerThreadList.add(new WorkerThread(waiting_queue));
         }
         for (WorkerThread runnable : workerThreadList) {

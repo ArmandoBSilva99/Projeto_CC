@@ -3,10 +3,10 @@ import java.util.concurrent.BlockingQueue;
 public class WorkerThread implements Runnable {
 
     private Thread thread = null;
-    private BlockingQueue taskQueue = null;
+    private BlockingQueue<Runnable> taskQueue = null;
     private boolean isStopped = false;
 
-    public WorkerThread(BlockingQueue queue) {
+    public WorkerThread(BlockingQueue<Runnable> queue) {
         taskQueue = queue;
     }
 
