@@ -37,9 +37,7 @@ public class ProcessPacket implements Runnable {
             DatagramPacket datagramAck = new DatagramPacket(ack, ack.length, this.address, this.port);
             to_send.send(datagramAck);
 
-            System.out.println("Receiving: " + received.getId() + " seqnum: " + received.getSeqNum() + " npack: " + received.getNPack());
-            boolean b = received.getSeqNum() == received.getNPack() - 1;
-            System.out.println("Last packet : " + b);
+            //System.out.println("Receiving: " + received.getId() + " seqnum: " + received.getSeqNum() + " npack: " + received.getNPack());
 
             if (received.getSeqNum() == received.getNPack() - 1) {
                 DataPacket to_process = packetManager.removeDataPacket(port);
@@ -48,31 +46,24 @@ public class ProcessPacket implements Runnable {
                     byte[] data = to_process.unifyBytes();
                     if (received.getId() == Packet.FILE_ID) {
                         writeFile(received.getNome(), data);
-                    }
-                    if (data != null)
-                        if (received.getId() == Packet.LIST_ID) {
-                            String his_file_list = new String(data, StandardCharsets.UTF_8);
+                    } else if (received.getId() == Packet.LIST_ID) {
+                        String his_file_list = new String(data, StandardCharsets.UTF_8);
 
-                            DataPacket missing_files = new DataPacket();
+                        DataPacket missing_files = new DataPacket();
 
-                            missing_files.missingFileListPackets(filepath, his_file_list);
-                            System.out.println(new String(missing_files.getPackets().get(0).getData()));
-                            packetManager.makeFileInfoMap(his_file_list);
+                        missing_files.missingFileListPackets(filepath, his_file_list);
+                        packetManager.makeFileInfoMap(his_file_list);
 
-                            SendPackets for_thread = new SendPackets(missing_files, address, FFSync.MAIN_PORT);
-
+                        SendPackets for_thread = new SendPackets(missing_files, address, FFSync.MAIN_PORT);
+                        threadPool.execute(for_thread);
+                    } else if (received.getId() == Packet.MISSING_ID) {
+                        String missing_files = new String(data, StandardCharsets.UTF_8);
+                        for (String filename : missing_files.split(FileInfo.file_separator)) {
+                            String combined_filepath = filepath + "/" + filename;
+                            SendPackets for_thread = new SendPackets(combined_filepath, address, FFSync.MAIN_PORT);
                             threadPool.execute(for_thread);
-
-                        } else if (received.getId() == Packet.MISSING_ID) {
-                            String missing_files = new String(data, StandardCharsets.UTF_8);
-                            System.out.println("missing files in else: " + missing_files);
-                            for (String filename : missing_files.split(FileInfo.file_separator)) {
-                                String combined_filepath = filepath + "/" + filename;
-                                System.out.println(combined_filepath);
-                                SendPackets for_thread = new SendPackets(combined_filepath, address, FFSync.MAIN_PORT);
-                                threadPool.execute(for_thread);
-                            }
                         }
+                    }
                 }
             }
         } catch (SocketException e) {

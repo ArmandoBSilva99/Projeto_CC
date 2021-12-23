@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class DataPacket {
     public static final int PACKET_SIZE = 1420;
-    private List<Packet> packets;  //Mudar para List<PacketHeader>
+    private List<Packet> packets;
 
     public DataPacket() {
         packets = new ArrayList<>();
@@ -57,8 +57,7 @@ public class DataPacket {
         StringBuilder sb = new StringBuilder();
 
         Map<String, FileInfo> files = FileInfo.getDirFileInfo(filepath);
-        System.out.println(files.size());
-        files.values().forEach(fileInfo -> sb.append(fileInfo.toString())); // talvez funcione testar ??
+        files.values().forEach(fileInfo -> sb.append(fileInfo.toString()));
         ByteArrayOutputStream data = new ByteArrayOutputStream();
         byte[] list = sb.toString().getBytes(StandardCharsets.UTF_8);
 
@@ -103,27 +102,18 @@ public class DataPacket {
 
     public byte[] unifyBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         for (Packet p : this.packets) {
-            if (p.getData() != null)
-                baos.write(p.getData());
+            baos.write(p.getData());
         }
-
         byte[] res = baos.toByteArray();
-
         baos.flush();
         baos.close();
-
         return res;
     }
 
     public void dataPacketToFile(String filepath) throws IOException {
-        //Packet name = Packet.fromBytes(this.packets.get(0));
-        //System.out.println("Before unified");
         byte[] unified = this.unifyBytes();
-        //System.out.println("After unified");
         try {
-
             Packet ps = this.packets.get(0);
             if (ps.getNome() != null) {
                 File outputFile = new File(filepath + "/" + ps.getNome());

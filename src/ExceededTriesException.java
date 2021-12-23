@@ -1,9 +1,9 @@
 public class ExceededTriesException extends Exception {
-    public ExceededTriesException(){
-
+    public ExceededTriesException() {
+        super();
     }
 
-    public ExceededTriesException(String s){
+    public ExceededTriesException(String s) {
         super(s);
     }
 }

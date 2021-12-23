@@ -14,11 +14,6 @@ public class Packet {
     private int seqnum;
     private byte[] data;
 
-
-    public Packet(char id) {
-        this.id = id;
-    }
-
     // packet for file
     public Packet(int size, int npack, String nome, int seqnum, byte[] data) {
         this.id = FILE_ID;
@@ -89,7 +84,6 @@ public class Packet {
         dos.flush();
         dos.close();
         baos.flush();
-        //System.out.println("To bytes completed");
         return baos.toByteArray();
     }
 

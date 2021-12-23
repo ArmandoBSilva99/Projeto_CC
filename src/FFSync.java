@@ -7,7 +7,7 @@ public class FFSync {
     public static void main(String args[]) throws UnknownHostException {
         String folder = args[0];
         String ip = args[1];
-
+/*
         //TCP THREAD
         TCPListener tcpl = new TCPListener(folder);
         Thread tcp = new Thread(tcpl);
@@ -17,11 +17,10 @@ public class FFSync {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        /*
+        */
         //UDP THREAD
-        ThreadedFTRapidProtocol dsa = new ThreadedFTRapidProtocol(folder,
-        InetAddress.getByName(ip));
-        
+        FTRapidProtocol dsa = new FTRapidProtocol(folder, InetAddress.getByName(ip));
+
         Thread udp = new Thread(dsa);
         udp.start();
         try {
@@ -29,7 +28,7 @@ public class FFSync {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        */
+
     }
 
 }
