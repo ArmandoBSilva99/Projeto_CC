@@ -53,7 +53,7 @@ public class DataPacket {
         }
     }
 
-    public void fileListPackets(String filepath) throws IOException, NullPointerException {
+    public void fileListPackets(String filepath) throws IOException, NullPointerException, FolderNotFoundException {
         StringBuilder sb = new StringBuilder();
 
         Map<String, FileInfo> files = FileInfo.getDirFileInfo(filepath);
@@ -78,7 +78,7 @@ public class DataPacket {
         }
     }
 
-    public void missingFileListPackets(String local_filepath, String received_file_list) throws IOException {
+    public void missingFileListPackets(String local_filepath, String received_file_list) throws IOException, FolderNotFoundException {
         byte[] missing_files = FileInfo.missingFiles(local_filepath, received_file_list).getBytes(StandardCharsets.UTF_8);
 
         ByteArrayOutputStream data = new ByteArrayOutputStream();

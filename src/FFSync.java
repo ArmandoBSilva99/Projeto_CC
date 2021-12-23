@@ -1,3 +1,4 @@
+import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -7,6 +8,12 @@ public class FFSync {
     public static void main(String args[]) throws UnknownHostException {
         String folder = args[0];
         String ip = args[1];
+
+        File f = new File(folder);
+        if (!f.isDirectory()) {
+            System.out.println("Folder doesn't exist!");
+            return;
+        }
 /*
         //TCP THREAD
         TCPListener tcpl = new TCPListener(folder);

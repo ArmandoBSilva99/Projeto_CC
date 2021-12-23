@@ -33,6 +33,7 @@ public class FileInfo {
 
     public static Map<String, FileInfo> getDirFileInfo(String filepath) throws IOException {
         File f = new File(filepath);
+
         BasicFileAttributes attr;
         Map<String, FileInfo> files = new HashMap<>();
 

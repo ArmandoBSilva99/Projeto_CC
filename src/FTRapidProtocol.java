@@ -49,7 +49,7 @@ public class FTRapidProtocol implements Runnable {
             }
         } catch (SocketTimeoutException e) {
             System.out.println("All Done!");
-        } catch (SocketException e) {
+        }  catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
