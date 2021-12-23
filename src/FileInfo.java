@@ -31,6 +31,12 @@ public class FileInfo {
         return this.modified_date;
     }
 
+    /**
+     * Cria um Map com a informação de cada ficheiro
+     * @param filepath
+     * @return
+     * @throws IOException
+     */
     public static Map<String, FileInfo> getDirFileInfo(String filepath) throws IOException {
         File f = new File(filepath);
 
@@ -45,6 +51,12 @@ public class FileInfo {
         return files;
     }
 
+    /**
+     * Faz parse da informação dos ficheiros
+     * @param s
+     * @return
+     * @throws DateTimeParseException
+     */
     public static Map<String, FileInfo> parse(String s) throws DateTimeParseException {
         Map<String, FileInfo> res = new HashMap<>();
         if (s.length() == 0) return res;
@@ -59,6 +71,13 @@ public class FileInfo {
         return res;
     }
 
+    /**
+     * Retorna uma String com o nome dos ficheiros em falta
+     * @param local_filepath
+     * @param received_file_list
+     * @return
+     * @throws IOException
+     */
     public static String missingFiles(String local_filepath, String received_file_list) throws IOException {
         Map<String, FileInfo> received_file_map = parse(received_file_list);
         Map<String, FileInfo> local_files = getDirFileInfo(local_filepath);
@@ -73,6 +92,12 @@ public class FileInfo {
         return sb.toString();
     }
 
+    /**
+     * Compara os ficheiros e retorna a lista dos ficheiros diferentes
+     * @param local_files
+     * @param received_files
+     * @return
+     */
     private static List<FileInfo> compareFiles(Map<String, FileInfo> local_files, Map<String, FileInfo> received_files) {
         List<FileInfo> files = new ArrayList<>();
         for (Map.Entry<String, FileInfo> entry : received_files.entrySet()) {

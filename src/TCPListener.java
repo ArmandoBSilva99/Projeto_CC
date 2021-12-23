@@ -18,7 +18,6 @@ public class TCPListener implements Runnable {
     public void run() {
         try {
             ServerSocket server = new ServerSocket(FFSync.MAIN_PORT);
-            // don't use buffered writer because we need to write both "text" and "binary"
             int count = 0;
             Socket conn = null;
             while (true) {

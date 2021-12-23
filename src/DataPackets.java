@@ -17,6 +17,10 @@ public class DataPackets {
         packets = new ArrayList<>();
     }
 
+    /**
+     * Adiciona o Packet p à lista 
+     * @param p
+     */
     public void add(Packet p) {
         this.packets.add(p.getSeqNum(), p);
     }
@@ -29,9 +33,14 @@ public class DataPackets {
         return this.packets.size();
     }
 
+    /**
+     * Armazena os fragmentos do ficheiro do filepath 
+     * @param filepath
+     * @throws IOException
+     */
     public void filePackets(String filepath) throws IOException {
         File f = new File(filepath);
-        byte[] file = Files.readAllBytes(Paths.get(filepath).toAbsolutePath()); // talvez mudar para absolute path!
+        byte[] file = Files.readAllBytes(Paths.get(filepath).toAbsolutePath());
         ByteArrayOutputStream data = new ByteArrayOutputStream();
 
         int file_size = (int) f.length();
@@ -52,6 +61,12 @@ public class DataPackets {
         }
     }
 
+    /**
+     * Armazena os fragmentos da lista de ficheiros locais
+     * @param filepath
+     * @throws IOException
+     * @throws NullPointerException
+     */
     public void fileListPackets(String filepath) throws IOException, NullPointerException {
         StringBuilder sb = new StringBuilder();
 
@@ -77,6 +92,12 @@ public class DataPackets {
         }
     }
 
+    /**
+     * Armazena a lista de ficheiros em falta da receive_file_list presentes no local_filepath
+     * @param local_filepath
+     * @param received_file_list
+     * @throws IOException
+     */
     public void missingFileListPackets(String local_filepath, String received_file_list) throws IOException {
         byte[] missing_files = FileInfo.missingFiles(local_filepath, received_file_list).getBytes(StandardCharsets.UTF_8);
 
@@ -99,6 +120,11 @@ public class DataPackets {
         }
     }
 
+    /**
+     * Une todos os fragmentos 
+     * @return
+     * @throws IOException
+     */
     public byte[] unifyBytes() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (Packet p : this.packets) {
@@ -110,6 +136,11 @@ public class DataPackets {
         return res;
     }
 
+    /**
+     * retorna o tamanho em bytes de todos os fragmentos
+     * @return
+     * @throws IOException
+     */
     public int byteSize() throws IOException {
         int npack = this.getPackets().get(0).getNPack();
         return (PACKET_SIZE * (npack - 1)) + this.getPackets().get(npack - 1).toBytes().length;

@@ -63,6 +63,11 @@ public class Packet {
         return this.nome;
     }
 
+    /**
+     * Transforma o Packet para bytes
+     * @return
+     * @throws IOException
+     */
     public byte[] toBytes() throws IOException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -87,6 +92,12 @@ public class Packet {
         return baos.toByteArray();
     }
 
+    /**
+     * Converte os bytes para Packet
+     * @param b
+     * @return
+     * @throws IOException
+     */
     public static Packet fromBytes(byte[] b) throws IOException {
         DataInputStream isr = new DataInputStream(new ByteArrayInputStream(b));
         byte[] data = null;
