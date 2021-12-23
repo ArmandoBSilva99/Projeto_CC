@@ -7,8 +7,8 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class FileInfo {
-    public static final String file_separator = "\u001C";
-    public static final String para_separator = "\u001F";
+    public static final String FILE_SEPARATOR = "\u001C";
+    public static final String PARA_SEPARATOR = "\u001F";
     private String name;
     private Instant creation_date;
     private Instant modified_date;
@@ -48,9 +48,9 @@ public class FileInfo {
     public static Map<String, FileInfo> parse(String s) throws DateTimeParseException {
         Map<String, FileInfo> res = new HashMap<>();
         if (s.length() == 0) return res;
-        String[] strings = s.split(FileInfo.file_separator);
+        String[] strings = s.split(FileInfo.FILE_SEPARATOR);
         for (String string : strings) {
-            String[] info = string.split(FileInfo.para_separator);
+            String[] info = string.split(FileInfo.PARA_SEPARATOR);
             Instant creation_date = Instant.parse(info[1]);
             Instant modified_date = Instant.parse(info[2]);
             FileInfo hi = new FileInfo(info[0], creation_date, modified_date);
@@ -68,7 +68,7 @@ public class FileInfo {
         StringBuilder sb = new StringBuilder();
 
         for (FileInfo file : difFiles)
-            sb.append(file.getName() + FileInfo.file_separator);
+            sb.append(file.getName() + FileInfo.FILE_SEPARATOR);
 
         return sb.toString();
     }
@@ -89,8 +89,8 @@ public class FileInfo {
 
     @Override
     public String toString() {
-        return this.name + para_separator +
-                this.creation_date.toString() + para_separator +
-                this.modified_date.toString() + file_separator;
+        return this.name + PARA_SEPARATOR +
+                this.creation_date.toString() + PARA_SEPARATOR +
+                this.modified_date.toString() + FILE_SEPARATOR;
     }
 }

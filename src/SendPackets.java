@@ -31,32 +31,40 @@ public class SendPackets implements Runnable {
             }
 
             List<Packet> data_packets = this.to_send.getPackets();
+            long start_time = System.currentTimeMillis();
             int tries = 0;
             for (int i = 0; i < to_send.size() && tries < 5; ) {
                 try {
                     s.setSoTimeout(10000); // Mudar
-                    //System.out.println("Sending from : " + Thread.currentThread() + " " + data_packets.get(i).getId() + " " + data_packets.get(i).getSeqNum());
                     byte[] packet_to_send = data_packets.get(i).toBytes();
                     DatagramPacket p = new DatagramPacket(packet_to_send, packet_to_send.length, ip, port);
                     s.send(p);
 
                     DatagramPacket ack = new DatagramPacket(new byte[DataPackets.PACKET_SIZE], DataPackets.PACKET_SIZE);
                     s.receive(ack);
-                    //System.out.println("ACK " + Packet.fromBytes(p.getData()).getId() + " " + Packet.fromBytes(p.getData()).getSeqNum());
                     if (Packet.fromBytes(ack.getData()).getSeqNum() == i)
                         i++;
                 } catch (SocketTimeoutException ignored) {
-                    System.out.println("Thread Expired");
+                    System.out.println("Retrying");
                     tries++;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            s.close(); //I ADDED THIS, MIGHT WORK
+            Packet pac = data_packets.get(0);
+            double transfer_time = (System.currentTimeMillis() - start_time) / 1000.0;
+
+            if (pac.getId() == Packet.FILE_ID) {
+                int bit_size = this.to_send.byteSize() * 8;
+                int bit_per_sec = (int) (bit_size / transfer_time);
+                System.out.println(" Filename: " + pac.getNome());
+                System.out.println(" Sent with debit: " + bit_per_sec + " bit/s \n");
+            }
+            s.close();
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
     }
 }

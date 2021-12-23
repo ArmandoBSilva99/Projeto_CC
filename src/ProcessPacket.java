@@ -32,12 +32,9 @@ public class ProcessPacket implements Runnable {
             Packet received = Packet.fromBytes(this.packet);
             packetManager.addPacket(port, received);
             DatagramSocket to_send = packetManager.getSocket(port);
-            System.out.println("Receiving from: " + port);
             byte[] ack = new Packet(received.getSeqNum()).toBytes();
             DatagramPacket datagramAck = new DatagramPacket(ack, ack.length, this.address, this.port);
             to_send.send(datagramAck);
-
-            //System.out.println("Receiving: " + received.getId() + " seqnum: " + received.getSeqNum() + " npack: " + received.getNPack());
 
             if (received.getSeqNum() == received.getNPack() - 1) {
                 DataPackets to_process = packetManager.removeDataPacket(port);
@@ -54,11 +51,21 @@ public class ProcessPacket implements Runnable {
                         missing_files.missingFileListPackets(filepath, his_file_list);
                         packetManager.makeFileInfoMap(his_file_list);
 
+                        System.out.println("---------TO SEND---------");
+                        if (missing_files.getPackets().get(0).getData().length != 0) {
+                            for (String s : FileInfo.missingFiles(filepath, his_file_list).split(FileInfo.FILE_SEPARATOR)) {
+                                System.out.println(" " + s);
+                            }
+                        } else {
+                            System.out.println(" All up to date");
+                        }
+                        System.out.println("-------------------------");
+
                         SendPackets for_thread = new SendPackets(missing_files, address, FFSync.MAIN_PORT);
                         threadPool.execute(for_thread);
-                    } else if (received.getId() == Packet.MISSING_ID) {
+                    } else if (received.getId() == Packet.MISSING_ID && data.length != 0) {
                         String missing_files = new String(data, StandardCharsets.UTF_8);
-                        for (String filename : missing_files.split(FileInfo.file_separator)) {
+                        for (String filename : missing_files.split(FileInfo.FILE_SEPARATOR)) {
                             String combined_filepath = filepath + "/" + filename;
                             SendPackets for_thread = new SendPackets(combined_filepath, address, FFSync.MAIN_PORT);
                             threadPool.execute(for_thread);

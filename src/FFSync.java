@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 public class FFSync {
     public static final int MAIN_PORT = 80;
 
-    public static void main(String args[]) throws UnknownHostException {
+    public static void main(String[] args) {
         String folder = args[0];
         String ip = args[1];
 
@@ -14,28 +14,25 @@ public class FFSync {
             System.out.println("Folder doesn't exist!");
             return;
         }
-/*
+
         //TCP THREAD
         TCPListener tcpl = new TCPListener(folder);
         Thread tcp = new Thread(tcpl);
+        //UDP THREAD
+        FTRapidProtocol FTRapid = null;
+        try {
+            FTRapid = new FTRapidProtocol(folder, InetAddress.getByName(ip));
+        } catch (UnknownHostException e) {
+            System.out.println("Host not found!");
+        }
+        Thread udp = new Thread(FTRapid);
+        udp.start();
         tcp.start();
         try {
+            udp.join();
             tcp.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        */
-        //UDP THREAD
-        FTRapidProtocol dsa = new FTRapidProtocol(folder, InetAddress.getByName(ip));
-
-        Thread udp = new Thread(dsa);
-        udp.start();
-        try {
-            udp.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
-
 }

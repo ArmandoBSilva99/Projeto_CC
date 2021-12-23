@@ -1,6 +1,5 @@
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -109,5 +108,10 @@ public class DataPackets {
         baos.flush();
         baos.close();
         return res;
+    }
+
+    public int byteSize() throws IOException {
+        int npack = this.getPackets().get(0).getNPack();
+        return (PACKET_SIZE * (npack - 1)) + this.getPackets().get(npack - 1).toBytes().length;
     }
 }

@@ -48,8 +48,10 @@ public class FTRapidProtocol implements Runnable {
                 threadPool.execute(processPacket);
             }
         } catch (SocketTimeoutException e) {
-            System.out.println("All Done!");
-        }  catch (SocketException e) {
+            threadPool.waitUntilAllTasksFinished();
+            //System.out.println("----------------------");
+            //System.out.println("All Done!");
+        } catch (SocketException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,7 +63,7 @@ public class FTRapidProtocol implements Runnable {
     private int connCheck(DatagramSocket s, InetAddress hostS, int port, Packet p) throws IOException {
         for (int i = 1; i < 5; i++)
             if (safetyMeasure(s, hostS, port)) {
-                System.out.println("Connection Established");
+                System.out.println("Connection Established\n");
                 return 0;
             } else {
                 System.out.println("Wrong shared password... Try Again (" + i + "/3)");
