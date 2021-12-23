@@ -9,6 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 
+/**
+ * Classe encarregue de processar todos os pacotes que a thread principal recebe, criando o seu Packet
+ * correspondente, armazenando-o e enviando o ack com o seu numero de sequencia.
+ * Caso receba o ultimo pacote de um sequencia, sendo um ficheiro, escreve-o na pasta escolhida, sendo
+ * a lista de ficheiros contida no servidor contrário, constrói a lista com os ficheiros em falta ou
+ * desatualizados e executa um sendPackets com a mesma, finalmente sendo uma lista com os ficheiros em
+ * falta, percorre a lista, e executa um sendPackets para cada elemento, ou seja um nome de ficheiro.
+ */
 public class ProcessPacket implements Runnable {
     private String filepath;
     private byte[] packet;

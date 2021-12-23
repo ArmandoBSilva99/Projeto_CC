@@ -2,6 +2,10 @@ import java.io.IOException;
 import java.net.*;
 import java.util.List;
 
+/**
+ * Classe encarregue de enviar todos os packets armazenados num DataPackets, ou caso
+ * receba um filename, cria um novo DataPackets que reparte o ficheiro e envia-o.
+ */
 public class SendPackets implements Runnable {
     private DataPackets to_send;
     private int port;
@@ -20,6 +24,7 @@ public class SendPackets implements Runnable {
         this.port = port;
         this.filename = filename;
     }
+
 
     @Override
     public void run() {
