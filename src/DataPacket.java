@@ -110,20 +110,4 @@ public class DataPacket {
         baos.close();
         return res;
     }
-
-    public void dataPacketToFile(String filepath) throws IOException {
-        byte[] unified = this.unifyBytes();
-        try {
-            Packet ps = this.packets.get(0);
-            if (ps.getNome() != null) {
-                File outputFile = new File(filepath + "/" + ps.getNome());
-                outputFile.createNewFile();
-                FileOutputStream fos = new FileOutputStream(outputFile);
-                fos.write(unified);
-                fos.flush();
-                fos.close();
-            }
-        } catch (Exception e) {
-        }
-    }
 }
