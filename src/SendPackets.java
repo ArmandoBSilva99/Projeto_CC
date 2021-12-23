@@ -3,12 +3,12 @@ import java.net.*;
 import java.util.List;
 
 public class SendPackets implements Runnable {
-    private DataPacket to_send;
+    private DataPackets to_send;
     private int port;
     private InetAddress ip;
     String filename;
 
-    public SendPackets(DataPacket to_send, InetAddress ip, int port) {
+    public SendPackets(DataPackets to_send, InetAddress ip, int port) {
         this.to_send = to_send;
         this.ip = ip;
         this.port = port;
@@ -26,7 +26,7 @@ public class SendPackets implements Runnable {
         try {
             DatagramSocket s = new DatagramSocket();
             if (filename != null) {
-                this.to_send = new DataPacket();
+                this.to_send = new DataPackets();
                 this.to_send.filePackets(filename);
             }
 
@@ -40,7 +40,7 @@ public class SendPackets implements Runnable {
                     DatagramPacket p = new DatagramPacket(packet_to_send, packet_to_send.length, ip, port);
                     s.send(p);
 
-                    DatagramPacket ack = new DatagramPacket(new byte[DataPacket.PACKET_SIZE], DataPacket.PACKET_SIZE);
+                    DatagramPacket ack = new DatagramPacket(new byte[DataPackets.PACKET_SIZE], DataPackets.PACKET_SIZE);
                     s.receive(ack);
                     //System.out.println("ACK " + Packet.fromBytes(p.getData()).getId() + " " + Packet.fromBytes(p.getData()).getSeqNum());
                     if (Packet.fromBytes(ack.getData()).getSeqNum() == i)

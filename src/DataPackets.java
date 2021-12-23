@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 
-public class DataPacket {
+public class DataPackets {
     public static final int PACKET_SIZE = 1420;
     private List<Packet> packets;
 
-    public DataPacket() {
+    public DataPackets() {
         packets = new ArrayList<>();
     }
 

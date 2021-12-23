@@ -40,7 +40,7 @@ public class ProcessPacket implements Runnable {
             //System.out.println("Receiving: " + received.getId() + " seqnum: " + received.getSeqNum() + " npack: " + received.getNPack());
 
             if (received.getSeqNum() == received.getNPack() - 1) {
-                DataPacket to_process = packetManager.removeDataPacket(port);
+                DataPackets to_process = packetManager.removeDataPacket(port);
                 packetManager.closeSocket(port);
                 if (to_process != null) {
                     byte[] data = to_process.unifyBytes();
@@ -49,7 +49,7 @@ public class ProcessPacket implements Runnable {
                     } else if (received.getId() == Packet.LIST_ID) {
                         String his_file_list = new String(data, StandardCharsets.UTF_8);
 
-                        DataPacket missing_files = new DataPacket();
+                        DataPackets missing_files = new DataPackets();
 
                         missing_files.missingFileListPackets(filepath, his_file_list);
                         packetManager.makeFileInfoMap(his_file_list);

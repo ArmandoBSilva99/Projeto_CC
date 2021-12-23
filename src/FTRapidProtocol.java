@@ -30,7 +30,7 @@ public class FTRapidProtocol implements Runnable {
             if (connCheck(main_socket, ip, FFSync.MAIN_PORT, packConn) == -1)
                 return; //Começa a conexão, i.e, verifica se estão comunicáveis
 
-            DataPacket fileList = new DataPacket();
+            DataPackets fileList = new DataPackets();
 
             fileList.fileListPackets(filepath);
             if (fileList.getPackets().get(0).getData().length != 0) {
@@ -40,8 +40,8 @@ public class FTRapidProtocol implements Runnable {
 
             while (true) {
                 main_socket.setSoTimeout(10000);
-                byte[] received_data = new byte[DataPacket.PACKET_SIZE];
-                DatagramPacket received_packet = new DatagramPacket(received_data, DataPacket.PACKET_SIZE);
+                byte[] received_data = new byte[DataPackets.PACKET_SIZE];
+                DatagramPacket received_packet = new DatagramPacket(received_data, DataPackets.PACKET_SIZE);
 
                 main_socket.receive(received_packet);
                 ProcessPacket processPacket = new ProcessPacket(filepath, received_packet.getData(), threadPool, packetManager, ip, received_packet.getPort());
@@ -97,7 +97,7 @@ public class FTRapidProtocol implements Runnable {
 
     //Receive Packets
     public byte[] receive(DatagramSocket s) throws IOException {
-        byte[] packetBytes = new byte[DataPacket.PACKET_SIZE];
+        byte[] packetBytes = new byte[DataPackets.PACKET_SIZE];
         DatagramPacket dp = new DatagramPacket(packetBytes, packetBytes.length);
         s.receive(dp);
         return packetBytes;

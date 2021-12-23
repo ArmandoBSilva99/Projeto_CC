@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class PacketManager {
     private ReentrantLock packets_lock;
     private ReentrantLock socket_lock;
-    private Map<Integer, DataPacket> packets;
+    private Map<Integer, DataPackets> packets;
     private Map<Integer, DatagramSocket> open_sockets;
     private Map<String, FileInfo> file_info_map;
 
@@ -25,7 +25,7 @@ public class PacketManager {
         socket_lock.unlock();
 
         packets_lock.lock();
-        packets.putIfAbsent(port, new DataPacket());
+        packets.putIfAbsent(port, new DataPackets());
         packets.get(port).add(packet);
         packets_lock.unlock();
     }
@@ -51,9 +51,9 @@ public class PacketManager {
         socket_lock.unlock();
     }
 
-    public DataPacket removeDataPacket(int port) {
+    public DataPackets removeDataPacket(int port) {
         packets_lock.lock();
-        DataPacket res = null;
+        DataPackets res = null;
         if (this.packets.containsKey(port))
             res = this.packets.remove(port);
         packets_lock.unlock();
