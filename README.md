@@ -1,2 +1,7 @@
 # Projeto_CC
-Projeto de Comunicações por Computador
+**Computer Comunication via sockes**
+
+#### Contributors:
+ - [Armando Silva](https://github.com/ArmandoBSilva99)
+ - [Joana Oliveira](https://github.com/joanaaVO)
+ - [Tiago Sousa](https://github.com/tsousa111)
